@@ -16,4 +16,4 @@ class Plan extends Model {
   }
 }
 
-export default Student;
+export default Plan;

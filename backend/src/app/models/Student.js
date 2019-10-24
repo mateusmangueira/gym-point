@@ -6,7 +6,13 @@ class Student extends Model {
       {
         name: Sequelize.STRING,
         email: Sequelize.STRING,
-        age: Sequelize.INTEGER,
+        dateOfBirth: Sequelize.DATE,
+        age: {
+          type: Sequelize.VIRTUAL,
+          get() {
+            return this.ageCalculate();
+          },
+        },
         weight: Sequelize.DOUBLE,
         height: Sequelize.DOUBLE,
       },
@@ -15,6 +21,13 @@ class Student extends Model {
       }
     );
     return this;
+  }
+
+  ageCalculate() {
+    const age = Math.floor(
+      differenceInCalendarDays(new Date(), this.dateOfBirth) / 365.25
+    );
+    return `${age} anos`;
   }
 }
 

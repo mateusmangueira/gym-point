@@ -4,17 +4,17 @@ import authConfig from '../../config/auth';
 
 export default async (req, res, next) => {
   const authHeader = req.headers.authorization;
-  const { admin } = req.body;
 
   if (!authHeader) {
     return res.status(401).json({ error: 'Token was not provided' });
   }
 
-  if (!admin) {
-    return res.status(401).json({ error: 'User is not an Admin' })
+  const [, token] = authHeader.split(' ');
+
+  if (bearer !== 'Bearer') {
+    return response.status(401).json({ error: 'Token has been modified' });
   }
 
-  const [, token] = authHeader.split(' ');
 
   try {
     const decoded = await promisify(jwt.verify)(token, authConfig.secret);

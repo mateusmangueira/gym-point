@@ -6,7 +6,7 @@ class Student extends Model {
       {
         name: Sequelize.STRING,
         email: Sequelize.STRING,
-        dateOfBirth: Sequelize.DATE,
+        date_of_birth: Sequelize.DATE,
         age: {
           type: Sequelize.VIRTUAL,
           get() {

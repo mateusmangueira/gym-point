@@ -14,7 +14,7 @@ class App {
   }
 
   routes() {
-    this.server.use(route);
+    this.server.use(routes);
   }
 }
 

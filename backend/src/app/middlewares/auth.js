@@ -3,6 +3,7 @@ import { promisify } from 'util';
 import authConfig from '../../config/auth';
 
 export default async (req, res, next) => {
+
   const authHeader = req.headers.authorization;
 
   if (!authHeader) {
@@ -15,11 +16,14 @@ export default async (req, res, next) => {
     return response.status(401).json({ error: 'Token has been modified' });
   }
 
-
   try {
+
     const decoded = await promisify(jwt.verify)(token, authConfig.secret);
+
     req.userId = decoded.id;
+
     return next();
+
   } catch (error) {
     return res.status(401).json({ error: 'Token is invalid' });
   }

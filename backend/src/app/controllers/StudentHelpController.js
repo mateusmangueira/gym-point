@@ -1,7 +1,7 @@
 import { isAfter } from 'date-fns';
 import * as Yup from 'yup';
 import HelpOrder from '../models/HelpOrder';
-import Enrollment from '../models/Enrollment';
+import Enroll from '../models/Enroll';
 
 class StudantHelpController {
 
@@ -24,13 +24,29 @@ class StudantHelpController {
     });
 
     if (!(await schema.isValid(req.body))) {
-      return res.status(400).json({ error: 'Validation failed' });
+      return res.status(400).json({ error: 'Student help order Validation failed' });
     }
 
     const { id } = req.params;
+
+    const student = await Student.findByPk(studentId);
+
+    if (!student) {
+      return res.status(400).json({ error: 'Student does not exist, help order validation failed' });
+    }
+
+    const enroll = await Enroll.findOne({
+      where: { student_id: id },
+    });
+
+    if (!enroll) {
+      return res
+        .status(400)
+        .json({ error: 'Student is not enrolled.' });
+    }
+
     const { question } = req.body;
 
-    // Check if the student is able to enter gym
     const isStudentAble = await Enroll.findOne({
       where: { student_id: id },
     });

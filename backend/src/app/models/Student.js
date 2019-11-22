@@ -13,8 +13,8 @@ class Student extends Model {
             return this.ageCalculate();
           },
         },
-        weight: Sequelize.DOUBLE,
-        height: Sequelize.DOUBLE,
+        weight: Sequelize.FLOAT,
+        height: Sequelize.FLOAT,
       },
       {
         sequelize,

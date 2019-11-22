@@ -1,8 +1,10 @@
-import { addMonths, parseISO } from 'date-fns';
+import { addMonths, parseISO, endOfDay } from 'date-fns';
 import Enroll from '../models/Enroll';
 import Student from '../models/Student';
 import Plan from '../models/Plan';
 import * as Yup from 'yup';
+
+import Queue from '../../lib/Queue';
 
 class EnrollController {
   async index(req, res) {
@@ -35,21 +37,29 @@ class EnrollController {
     });
 
     if (!(await schema.isValid(req.body))) {
-      return res.status(400).json({ error: 'Validation failed' });
+      return res.status(400).json({ error: 'Enroll validation failed' });
     }
 
     const { student_id, plan_id, start_date } = req.body;
+
     const enrollExists = await Enroll.findOne({
       where: { student_id },
     });
 
     if (enrollExists) {
-      return res.status(401).json({ error: 'Enroll studant failed: This student is already enrolled to a gym.' });
+      return res.status(401).json({ error: 'Enroll student failed: This student is already enrolled to a gym.' });
     }
 
-    const plan = await Plan.findByPk(plan_id);
+    const plan = await Plan.findByPk(plan_id, {
+      attributes: ['id', 'title', 'duration', 'price'],
+    });
+
+    if (!plan) {
+      return res.status(400).json({ error: 'Plan does not exist' });
+    }
+
     const price = plan.duration * plan.price;
-    const end_date = addMonths(parseISO(start_date), plan.duration);
+    const end_date = endOfDay(addMonths(parseISO(start_date), plan.duration));
 
     const enroll = await Enroll.create({
       student_id,
@@ -58,6 +68,13 @@ class EnrollController {
       end_date,
       price,
     });
+
+    await Queue.add(StoreEnrollMail.key, {
+			student,
+			plan,
+			price,
+			end_date,
+		});
 
     return res.json(enroll);
   }
@@ -70,7 +87,7 @@ class EnrollController {
     });
 
     if (!(await schema.isValid(req.body))) {
-      return res.status(400).json({ error: 'Update studant validation failed' });
+      return res.status(400).json({ error: 'Update enrollment validation failed' });
     }
 
     const { id } = req.params;
@@ -79,7 +96,6 @@ class EnrollController {
     const enrollment = await Enroll.findByPk(id);
     const plan = await Plan.findByPk(plan_id);
 
-    // Check if admin can edit student_id
     if (student_id !== enrollment.student_id) {
       const studentEnrollmentExists = await Enroll.findOne({
         where: { student_id },
@@ -115,10 +131,16 @@ class EnrollController {
   async delete(req, res) {
     const { id } = req.params;
 
-    await Enroll.destroy({ where: { id } });
+    const enroll = await Enrollment.findByPk(id);
 
-    return res.send();
-  }
+		if (!enroll) {
+			return res.status(400).json({ error: 'Enrollment does not exist' });
+		}
+
+		enroll.destroy();
+
+		return res.send();
+	}
 
 }
 

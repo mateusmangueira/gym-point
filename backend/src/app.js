@@ -1,6 +1,9 @@
 import express from 'express';
 import route from './routes';
+import cors from 'cors';
 import './database';
+
+import 'dotenv/config';
 
 class App {
   constructor() {
@@ -14,6 +17,7 @@ class App {
   }
 
   routes() {
+    this.server.use(cors());
     this.server.use(route);
   }
 }

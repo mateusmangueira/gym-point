@@ -1,7 +1,7 @@
 import * as Yup from 'yup';
 import Student from '../models/Student';
 import HelpOrder from '../models/HelpOrder';
-import AnswerMail from '../jobs/AnswerMail';
+import AnswerMail from '../jobs/StoreHelpOrder';
 import Queue from '../../lib/Queue';
 
 class HelpOrderController {

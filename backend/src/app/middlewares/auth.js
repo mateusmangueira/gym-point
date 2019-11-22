@@ -12,10 +12,6 @@ export default async (req, res, next) => {
 
   const [, token] = authHeader.split(' ');
 
-  if (bearer !== 'Bearer') {
-    return response.status(401).json({ error: 'Token has been modified' });
-  }
-
   try {
 
     const decoded = await promisify(jwt.verify)(token, authConfig.secret);

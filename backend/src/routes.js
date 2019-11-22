@@ -2,6 +2,7 @@
 import { Router } from 'express';
 
 //Importes dos Controllers da aplicacao
+import UserController from './app/controllers/UserController';
 import StudentController from './app/controllers/StudentController';
 import SessionController from './app/controllers/SessionController';
 import EnrollController from './app/controllers/EnrollController';
@@ -16,8 +17,11 @@ import authMiddleware from './app/middlewares/auth';
 const routes = new Router();
 
 //Rotas sem autenticacao
-routes.post('/sessions', SessionController.store);
+routes.post('/users', UserController.store);
+routes.get('/users', UserController.index);
+routes.put('/users', UserController.update);
 
+routes.post('/sessions', SessionController.store);
 routes.get('/students/:id/checkins', CheckinController.index);
 routes.post('/students/:id/checkins', CheckinController.store);
 

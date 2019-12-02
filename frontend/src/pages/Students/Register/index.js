@@ -17,23 +17,27 @@ const schema = Yup.object().shape({
   email: Yup.string()
     .email('Insira um e-mail válido')
     .required('O e-email é obrigatório'),
-  idade: Yup.number()
+  age: Yup.number()
     .required('A idade é obrigatória')
     .typeError('Insira uma idade válida'),
-  altura: Yup.number()
+  weight: Yup.number()
+    .required('O peso é obrigatório')
+    .typeError('Insira um peso válido'),
+  height: Yup.number()
     .required('A altura é obrigatória')
-    .typeError('Insira uma idade válida'),
+    .typeError('Insira uma altura válida'),
 });
 
 export default function Register() {
-  async function hanldeSubmit(data, { resetForm }) {
-    const { name, email, idade, altura } = data;
+  async function handleSubmit(data, { resetForm }) {
+    const { name, email, date_of_birth, height, weight } = data;
     try {
       await api.post('students', {
         name,
         email,
-        idade,
-        altura,
+        date_of_birth,
+        height,
+        weight,
       });
 
       history.push('/students');
@@ -55,7 +59,7 @@ export default function Register() {
         </div>
       </header>
 
-      <Form schema={schema} onSubmit={hanldeSubmit} id="student-form">
+      <Form schema={schema} onSubmit={handleSubmit} id="student-form">
         <span>NOME COMPLETO</span>
         <Input name="name" type="text" placeholder="Nome completo do aluno" />
         <span>ENDEREÇO DE E-MAIL</span>
@@ -63,15 +67,15 @@ export default function Register() {
         <div>
           <div>
             <span>IDADE</span>
-            <Input name="idade" type="text" />
+            <Input name="age" type="text" />
           </div>
           <div>
             <span>PESO (em kg)</span>
             <Input name="peso" type="text" />
           </div>
           <div>
-            <span>Altura</span>
-            <Input name="altura" type="text" />
+            <span>ALTURA</span>
+            <Input name="height" type="text" />
           </div>
         </div>
       </Form>

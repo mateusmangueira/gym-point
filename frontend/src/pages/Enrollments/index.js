@@ -91,12 +91,12 @@ export default function Enrollments() {
                 </td>
                 <td>
                   <div>
-                    <Link to="/">editar</Link>
+                    <Link to="/">Editar</Link>
                     <button
                       type="button"
                       onClick={() => handleDelete(enrollment)}
                     >
-                      apagar
+                      Apagar
                     </button>
                   </div>
                 </td>

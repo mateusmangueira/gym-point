@@ -99,7 +99,7 @@ export default function Students() {
               <tr key={student.id}>
                 <td>{student.name}</td>
                 <td>{student.email}</td>
-                <td>{student.idade}</td>
+                <td>{student.age}</td>
                 <td>
                   <div>
                     <Link

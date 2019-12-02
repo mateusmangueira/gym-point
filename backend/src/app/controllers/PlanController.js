@@ -1,7 +1,7 @@
 import * as Yup from 'yup';
+import Plan from '../models/Plan';
 
 class PlanController {
-
   async index(req, res) {
     const { page = 1, quantity = 20 } = req.params;
 
@@ -31,7 +31,7 @@ class PlanController {
   }
 
   async update(req, res) {
-     const schema = Yup.object().shape({
+    const schema = Yup.object().shape({
       title: Yup.string().required(),
       duration: Yup.number().required(),
       price: Yup.number().required(),

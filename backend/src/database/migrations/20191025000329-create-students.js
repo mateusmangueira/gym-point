@@ -1,5 +1,4 @@
 module.exports = {
-  
   up: (queryInterface, Sequelize) => {
     return queryInterface.createTable('students', {
       id: {
@@ -17,7 +16,7 @@ module.exports = {
         allowNull: false,
         unique: true,
       },
-      birth: {
+      date_of_birth: {
         type: Sequelize.DATE,
         allowNull: false,
       },

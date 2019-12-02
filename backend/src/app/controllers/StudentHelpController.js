@@ -2,9 +2,9 @@ import { isAfter } from 'date-fns';
 import * as Yup from 'yup';
 import HelpOrder from '../models/HelpOrder';
 import Enroll from '../models/Enroll';
+import Student from '../models/Student';
 
 class StudantHelpController {
-
   async index(req, res) {
     const { page = 1, quantity = 20 } = req.params;
 
@@ -24,15 +24,19 @@ class StudantHelpController {
     });
 
     if (!(await schema.isValid(req.body))) {
-      return res.status(400).json({ error: 'Student help order Validation failed' });
+      return res
+        .status(400)
+        .json({ error: 'Student help order validation failed' });
     }
 
     const { id } = req.params;
 
-    const student = await Student.findByPk(studentId);
+    const student = await Student.findByPk(id);
 
     if (!student) {
-      return res.status(400).json({ error: 'Student does not exist, help order validation failed' });
+      return res.status(400).json({
+        error: 'Student does not exist, help order failed',
+      });
     }
 
     const enroll = await Enroll.findOne({
@@ -40,9 +44,7 @@ class StudantHelpController {
     });
 
     if (!enroll) {
-      return res
-        .status(400)
-        .json({ error: 'Student is not enrolled.' });
+      return res.status(400).json({ error: 'Student is not enrolled.' });
     }
 
     const { question } = req.body;

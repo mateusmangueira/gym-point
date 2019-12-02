@@ -32,7 +32,7 @@ class StudentController {
     });
 
     if (!(await schema.isValid(req.body))) {
-      return res.status(400).json({ error: 'Validation failed' });
+      return res.status(400).json({ error: 'Student store validation failed' });
     }
 
     const { email, age } = req.body;
@@ -64,7 +64,9 @@ class StudentController {
     });
 
     if (!(await schema.isValid(req.body))) {
-      return res.status(400).json({ error: 'Validation failed' });
+      return res
+        .status(400)
+        .json({ error: 'Student update validation failed' });
     }
 
     const { id } = req.params;
@@ -73,7 +75,7 @@ class StudentController {
     if (isAfter(parseISO(age), new Date())) {
       return res
         .status(400)
-        .json({ error: 'age date can not be after current date' });
+        .json({ error: 'Age date cannot be after current date' });
     }
 
     const student = await Student.findByPk(id);

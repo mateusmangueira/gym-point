@@ -6,7 +6,6 @@ import Student from '../models/Student';
 import Enroll from '../models/Enroll';
 
 class CheckinController {
-
   async index(req, res) {
     const { page = 1, quantity = 20, id } = req.params;
 
@@ -56,12 +55,8 @@ class CheckinController {
     return res.json(checkin);
   }
 
-  async update(req, res) {
-    return res.json();
-  }
-
   async delete(req, res) {
-   const { id } = req.params;
+    const { id } = req.params;
 
     await Checkin.destroy({ where: { id } });
 
@@ -69,4 +64,4 @@ class CheckinController {
   }
 }
 
-export default new CheckinController()
+export default new CheckinController();

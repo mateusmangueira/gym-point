@@ -4,7 +4,6 @@ import User from '../models/User';
 import authConfig from '../../config/auth';
 
 class SessionController {
-
   async store(req, res) {
     const schema = Yup.object().shape({
       email: Yup.string()
@@ -14,7 +13,7 @@ class SessionController {
     });
 
     if (!(await schema.isValid(req.body))) {
-      return res.status(400).json({ error: 'Session validation failed' });
+      return res.status(400).json({ error: 'Session store validation failed' });
     }
 
     const { email, password } = req.body;

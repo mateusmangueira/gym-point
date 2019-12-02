@@ -1,10 +1,11 @@
 import { addMonths, parseISO, endOfDay } from 'date-fns';
+import * as Yup from 'yup';
 import Enroll from '../models/Enroll';
 import Student from '../models/Student';
 import Plan from '../models/Plan';
-import * as Yup from 'yup';
 
 import Queue from '../../lib/Queue';
+import StoreEnrollMail from '../jobs/StoreEnrollMail';
 
 class EnrollController {
   async index(req, res) {
@@ -37,7 +38,7 @@ class EnrollController {
     });
 
     if (!(await schema.isValid(req.body))) {
-      return res.status(400).json({ error: 'Enroll validation failed' });
+      return res.status(400).json({ error: 'Enroll store validation failed' });
     }
 
     const { student_id, plan_id, start_date } = req.body;
@@ -47,7 +48,16 @@ class EnrollController {
     });
 
     if (enrollExists) {
-      return res.status(401).json({ error: 'Enroll student failed: This student is already enrolled to a gym.' });
+      return res.status(401).json({
+        error:
+          'Enroll student failed: This student is already enrolled to a gym.',
+      });
+    }
+
+    const student = await Student.findByPk(student_id);
+
+    if (!student) {
+      return res.status(400).json({ error: 'Student does not exist' });
     }
 
     const plan = await Plan.findByPk(plan_id, {
@@ -70,11 +80,11 @@ class EnrollController {
     });
 
     await Queue.add(StoreEnrollMail.key, {
-			student,
-			plan,
-			price,
-			end_date,
-		});
+      student,
+      plan,
+      price,
+      end_date,
+    });
 
     return res.json(enroll);
   }
@@ -87,7 +97,9 @@ class EnrollController {
     });
 
     if (!(await schema.isValid(req.body))) {
-      return res.status(400).json({ error: 'Update enrollment validation failed' });
+      return res
+        .status(400)
+        .json({ error: 'Update enrollment validation failed' });
     }
 
     const { id } = req.params;
@@ -102,7 +114,10 @@ class EnrollController {
       });
 
       if (studentEnrollmentExists) {
-        return res.status(401).json({ error: 'Update student failed: This student is already enrolled to a gym.' });
+        return res.status(401).json({
+          error:
+            'Update student failed: This student is already enrolled to a gym.',
+        });
       }
     }
 
@@ -131,17 +146,16 @@ class EnrollController {
   async delete(req, res) {
     const { id } = req.params;
 
-    const enroll = await Enrollment.findByPk(id);
+    const enroll = await Enroll.findByPk(id);
 
-		if (!enroll) {
-			return res.status(400).json({ error: 'Enrollment does not exist' });
-		}
+    if (!enroll) {
+      return res.status(400).json({ error: 'Enrollment does not exist' });
+    }
 
-		enroll.destroy();
+    enroll.destroy();
 
-		return res.send();
-	}
-
+    return res.send();
+  }
 }
 
-export default new EnrollController()
+export default new EnrollController();

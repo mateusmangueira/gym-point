@@ -7,7 +7,7 @@ class Checkin extends Model {
         student_id: Sequelize.INTEGER,
       },
       {
-        sequelize
+        sequelize,
       }
     );
     return this;

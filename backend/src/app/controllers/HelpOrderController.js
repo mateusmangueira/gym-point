@@ -1,11 +1,11 @@
 import * as Yup from 'yup';
 import Student from '../models/Student';
 import HelpOrder from '../models/HelpOrder';
-import AnswerMail from '../jobs/StoreHelpOrder';
+
+import StoreHelpOrder from '../jobs/StoreHelpOrder';
 import Queue from '../../lib/Queue';
 
 class HelpOrderController {
-
   async index(req, res) {
     const { page = 1, quantity = 20 } = req.params;
 
@@ -31,7 +31,9 @@ class HelpOrderController {
     });
 
     if (!(await schema.isValid(req.body))) {
-      return res.status(400).json({ error: 'Validation failed' });
+      return res
+        .status(400)
+        .json({ error: 'Help Order Admin validation failed' });
     }
 
     const { id } = req.params;
@@ -56,20 +58,12 @@ class HelpOrderController {
     await helpOrder.update({ answer, answer_at: new Date() });
     await helpOrder.save();
 
-    await Queue.add(AnswerMail.key, {
+    await Queue.add(StoreHelpOrder.key, {
       helpOrder,
     });
 
     return res.json(helpOrder);
   }
-
-  async update(req, res) {
-    return res.json();
-  }
-
-  async delete(req, res) {
-    return res.json();
-  }
 }
 
-export default new HelpOrderController()
+export default new HelpOrderController();

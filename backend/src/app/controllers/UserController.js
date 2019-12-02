@@ -2,7 +2,6 @@ import * as Yup from 'yup';
 import User from '../models/User';
 
 class UserController {
-
   async index(req, res) {
     const users = await User.findAll({
       attributes: ['id', 'name', 'email'],
@@ -33,7 +32,6 @@ class UserController {
     return res.json({ id, name, email });
   }
 
-
   async update(req, res) {
     const schema = Yup.object().shape({
       name: Yup.string(),
@@ -53,7 +51,7 @@ class UserController {
       return res.status(400).json({ error: 'User validation failed' });
     }
 
-    const { email, oldPassword } = req.body;
+    const { id, name, email, oldPassword } = req.body;
     const user = await User.findByPk(req.userId);
 
     if (email !== user.email) {
@@ -71,7 +69,6 @@ class UserController {
     }
 
     await user.update(req.body);
-
 
     return res.json({
       id,

@@ -1,4 +1,5 @@
 import * as Yup from 'yup';
+
 import Plan from '../models/Plan';
 
 class PlanController {

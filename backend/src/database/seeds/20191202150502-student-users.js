@@ -4,7 +4,7 @@ module.exports = {
       'students',
       [
         {
-          name: 'Aluno Teste',
+          name: 'Mateus Aluno Teste',
           email: 'alunoteste@gmail.com',
           date_of_birth: new Date('1996-10-25 10:00:00'),
           weight: 78,

@@ -9,23 +9,24 @@ module.exports = {
       },
       student_id: {
         type: Sequelize.INTEGER,
-        allowNull: false,
-        references: {
-          model: 'students',
-          key: 'id',
-        },
+        references: { model: 'students', key: 'id' },
         onUpdate: 'CASCADE',
-        onDelete: 'SET NULL',
+        onDelete: 'CASCADE',
+        allowNull: false,
       },
       question: {
-        type: Sequelize.STRING,
+        type: Sequelize.TEXT,
         allowNull: false,
       },
       answer: {
-        type: Sequelize.STRING,
+        type: Sequelize.TEXT,
+        allowNull: true,
+        defaultValue: null,
       },
       answer_at: {
         type: Sequelize.DATE,
+        allowNull: true,
+        defaultValue: null,
       },
       created_at: {
         type: Sequelize.DATE,
@@ -39,6 +40,6 @@ module.exports = {
   },
 
   down: queryInterface => {
-    return queryInterface.dropTable('help_orders');
+    return queryInterface.dropTable('help-orders');
   },
 };

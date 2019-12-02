@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Route, Redirect } from 'react-router-dom';
 
-import DefautlLayout from '~/pages/_layouts/default';
+import LayoutDefault from '~/pages/_layouts/default';
 import AuthLayout from '~/pages/_layouts/auth';
 
 import { store } from '~/store';
@@ -22,7 +22,7 @@ export default function RouteWrapper({
     return <Redirect to="/students" />;
   }
 
-  const Layout = signed ? DefautlLayout : AuthLayout;
+  const Layout = signed ? LayoutDefault : AuthLayout;
 
   return (
     <Route

@@ -14,17 +14,17 @@ import Routes from '~/routes';
 import GlobalStyle from '~/styles/global';
 
 function App() {
-	return (
-		<Provider store={store}>
-			<PersistGate persistor={persistor}>
-				<Router history={history}>
-					<Routes />
-					<GlobalStyle />
-					<ToastContainer autoClose={3000} />
-				</Router>
-			</PersistGate>
-		</Provider>
-	);
+  return (
+    <Provider store={store}>
+      <PersistGate persistor={persistor}>
+        <Router history={history}>
+          <Routes />
+          <GlobalStyle />
+          <ToastContainer autoClose={3000} />
+        </Router>
+      </PersistGate>
+    </Provider>
+  );
 }
 
 export default App;

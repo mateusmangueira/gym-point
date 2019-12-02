@@ -34,8 +34,8 @@ export default function Header() {
 
         <aside>
           <Profile>
-            <strong>{profile.name}</strong>
-            <button onClick={handleSignOut} type="button">
+            <strong>{profile.name} </strong>
+            <button type="button" onClick={handleSignOut}>
               Sair do sistema
             </button>
           </Profile>

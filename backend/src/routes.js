@@ -18,11 +18,11 @@ routes.post('users', UserController.store); // Teste ok
 
 routes.post('/sessions', SessionController.store); // Teste ok
 
-routes.get('/students/:id/checkins', CheckinController.index);
-routes.post('/students/:id/checkins', CheckinController.store);
+routes.get('/students/:id/checkins', CheckinController.index); // Teste ok
+routes.post('/students/:id/checkins', CheckinController.store); // Teste ok
 
-routes.get('/students/:id/help-orders', StudentHelpController.index);
-routes.post('/students/:id/help-orders', StudentHelpController.store);
+routes.get('/students/:id/help-orders', StudentHelpController.index); // Teste ok
+routes.post('/students/:id/help-orders', StudentHelpController.store); // Teste ok
 
 routes.use(authMiddleware);
 
@@ -44,7 +44,7 @@ routes.post('/enrolls', EnrollController.store); // Teste ok
 routes.put('/enrolls/:id', EnrollController.update); // Teste ok
 routes.delete('/enrolls/:id', EnrollController.delete); // Teste ok
 
-routes.get('/help-orders', HelpOrderController.index); // Teste Failed
-routes.post('/help-orders/:id/answer', HelpOrderController.store);
+routes.get('/help-orders', HelpOrderController.index); // Teste ok
+routes.post('/help-orders/:id/answer', HelpOrderController.store); // Teste ok
 
 export default routes;

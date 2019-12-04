@@ -50,9 +50,9 @@ class CheckinController {
         .status(401)
         .json({ error: 'You can only check-in five times per week' });
     }
-    const checkin = await Checkin.create({ student_id: id });
+    const { student_id, created_at } = await Checkin.create({ student_id: id });
 
-    return res.json(checkin);
+    return res.json({ id, student_id, created_at });
   }
 
   async delete(req, res) {

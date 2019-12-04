@@ -50,7 +50,7 @@ class HelpOrderController {
       ],
     });
 
-    if (helpOrder.answer_at) {
+    if (helpOrder.answer !== null) {
       return res
         .status(401)
         .json({ error: 'You can answer a help order only once' });

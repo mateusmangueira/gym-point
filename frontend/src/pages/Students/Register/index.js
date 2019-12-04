@@ -1,9 +1,9 @@
 import React from 'react';
-import { toast } from 'react-toastify';
 import * as Yup from 'yup';
+import { toast } from 'react-toastify';
 
-import api from '~/services/api';
 import history from '~/services/history';
+import api from '~/services/api';
 
 import Input from '~/components/Input';
 import ButtonBack from '~/components/ButtonBack';
@@ -29,22 +29,20 @@ const schema = Yup.object().shape({
 });
 
 export default function Register() {
-  async function handleSubmit(data, { resetForm }) {
-    const { name, email, date_of_birth, height, weight } = data;
+  async function handleRegister({ name, email, age, height, weight }) {
     try {
-      await api.post('students', {
+      await api.post('/students', {
         name,
         email,
-        date_of_birth,
+        age,
         height,
         weight,
       });
 
-      history.push('/students');
-      toast.success('Aluno cadastrado com sucesso!');
-    } catch (error) {
-      resetForm();
-      toast.error('Aluno já cadastrado');
+      toast.success('Aluno criado com sucesso!');
+      history.goBack();
+    } catch (err) {
+      toast.error('Já existe um aluno cadastrado com esse e-mail');
     }
   }
 
@@ -59,19 +57,19 @@ export default function Register() {
         </div>
       </header>
 
-      <Form schema={schema} onSubmit={handleSubmit} id="student-form">
+      <Form schema={schema} onSubmit={handleRegister} id="student-form">
         <span>NOME COMPLETO</span>
         <Input name="name" type="text" placeholder="Nome completo do aluno" />
         <span>ENDEREÇO DE E-MAIL</span>
         <Input name="email" type="email" placeholder="exemplo@email.com" />
         <div>
           <div>
-            <span>IDADE</span>
+            <span>DATA DE NASCIMENTO</span>
             <Input name="age" type="text" />
           </div>
           <div>
             <span>PESO (em kg)</span>
-            <Input name="peso" type="text" />
+            <Input name="weight" type="text" />
           </div>
           <div>
             <span>ALTURA</span>

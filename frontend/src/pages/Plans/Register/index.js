@@ -34,7 +34,7 @@ export default function Register() {
     setTotalPrice(formatPrice(priceForm * durationForm || 0));
   }, [durationForm, priceForm]);
 
-  async function hanldeSubmit({ title, duration, price }) {
+  async function handleSubmit({ title, duration, price }) {
     try {
       await api.post('plans', {
         title,
@@ -64,7 +64,7 @@ export default function Register() {
         <Form
           schema={schema}
           initialData={{ totalPrice }}
-          onSubmit={hanldeSubmit}
+          onSubmit={handleSubmit}
           id="plan-form"
         >
           <span>TÍTULO DO PLANO</span>

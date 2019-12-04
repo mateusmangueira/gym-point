@@ -23,7 +23,7 @@ class PlanController {
     });
 
     if (!(await schema.isValid(req.body))) {
-      return res.status(400).json({ error: 'Validation failed' });
+      return res.status(400).json({ error: 'Plan store validation failed' });
     }
 
     const plan = await Plan.create(req.body);
@@ -33,13 +33,13 @@ class PlanController {
 
   async update(req, res) {
     const schema = Yup.object().shape({
-      title: Yup.string().required(),
-      duration: Yup.number().required(),
-      price: Yup.number().required(),
+      title: Yup.string(),
+      duration: Yup.number(),
+      price: Yup.number(),
     });
 
     if (!(await schema.isValid(req.body))) {
-      return res.status(400).json({ error: 'Validation failed' });
+      return res.status(400).json({ error: 'Plan update validation failed' });
     }
 
     const { id } = req.params;
@@ -67,7 +67,7 @@ class PlanController {
 
     await Plan.destroy({ where: { id } });
 
-    return res.send();
+    return res.send({ ok: 'Plan has been succefully deleted' });
   }
 }
 

@@ -27,42 +27,40 @@ class StudentController {
   async store(req, res) {
     const schema = Yup.object().shape({
       name: Yup.string().required(),
-      email: Yup.string().required(),
-      age: Yup.date().required(),
+      email: Yup.string()
+        .email()
+        .required(),
+      age: Yup.number().required(),
       weight: Yup.number().required(),
       height: Yup.number().required(),
     });
 
     if (!(await schema.isValid(req.body))) {
-      return res.status(400).json({ error: 'Student store validation failed' });
+      return res.status(400).json({ error: 'Student validation failed' });
     }
 
-    const { email, age } = req.body;
-
-    if (isAfter(parseISO(age), new Date())) {
-      return res
-        .status(400)
-        .json({ error: 'You age cannot be after current date' });
-    }
-
-    const studentExists = await Student.findOne({ where: { email } });
+    const studentExists = await Student.findOne({
+      where: { email: req.body.email },
+    });
 
     if (studentExists) {
-      return res.status(400).json({ error: 'Student already exists' });
+      return res.status(400).json({ error: 'Student already exists.' });
     }
 
-    const student = await Student.create(req.body);
+    const { id, name, email, age, weight, height } = await Student.create(
+      req.body
+    );
 
-    return res.json(student);
+    return res.json({ id, name, email, age, weight, height });
   }
 
   async update(req, res) {
     const schema = Yup.object().shape({
-      name: Yup.string().required(),
-      email: Yup.string().required(),
-      age: Yup.date().required(),
-      weight: Yup.number().required(),
-      height: Yup.number().required(),
+      name: Yup.string(),
+      email: Yup.string().email(),
+      age: Yup.number().positive(),
+      weight: Yup.number().positive(),
+      height: Yup.number().positive(),
     });
 
     if (!(await schema.isValid(req.body))) {
@@ -73,12 +71,6 @@ class StudentController {
 
     const { id } = req.params;
     const { name, email, age, weight, height } = req.body;
-
-    if (isAfter(parseISO(age), new Date())) {
-      return res
-        .status(400)
-        .json({ error: 'Age date cannot be after current date' });
-    }
 
     const student = await Student.findByPk(id);
 
@@ -101,7 +93,7 @@ class StudentController {
 
     await Student.destroy({ where: { id } });
 
-    return res.send();
+    return res.send({ ok: 'Student has been succefully deleted ' });
   }
 }
 

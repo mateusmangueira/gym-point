@@ -92,9 +92,9 @@ class EnrollController {
 
   async update(req, res) {
     const schema = Yup.object().shape({
-      student_id: Yup.number().required(),
-      plan_id: Yup.number().required(),
-      start_date: Yup.date().required(),
+      student_id: Yup.number(),
+      plan_id: Yup.number(),
+      start_date: Yup.date(),
     });
 
     if (!(await schema.isValid(req.body))) {
@@ -109,7 +109,7 @@ class EnrollController {
     const enrollment = await Enroll.findByPk(id);
     const plan = await Plan.findByPk(plan_id);
 
-    if (student_id !== enrollment.student_id) {
+    if (student_id === enrollment.student_id) {
       const studentEnrollmentExists = await Enroll.findOne({
         where: { student_id },
       });
@@ -117,7 +117,7 @@ class EnrollController {
       if (studentEnrollmentExists) {
         return res.status(401).json({
           error:
-            'Update student failed: This student is already enrolled to a gym.',
+            'Enrollment update failed: This student is already enrolled to a gym.',
         });
       }
     }
@@ -155,7 +155,7 @@ class EnrollController {
 
     enroll.destroy();
 
-    return res.send();
+    return res.send({ ok: 'Enrollment has been succefully deleted' });
   }
 }
 

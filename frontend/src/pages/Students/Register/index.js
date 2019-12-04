@@ -39,8 +39,8 @@ export default function Register() {
         weight,
       });
 
-      toast.success('Aluno criado com sucesso!');
       history.goBack();
+      toast.success('Aluno criado com sucesso!');
     } catch (err) {
       toast.error('Já existe um aluno cadastrado com esse e-mail');
     }
@@ -64,7 +64,7 @@ export default function Register() {
         <Input name="email" type="email" placeholder="exemplo@email.com" />
         <div>
           <div>
-            <span>DATA DE NASCIMENTO</span>
+            <span>IDADE</span>
             <Input name="age" type="text" />
           </div>
           <div>

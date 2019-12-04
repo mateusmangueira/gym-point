@@ -1,4 +1,4 @@
-import { addMonths, parseISO, endOfDay } from 'date-fns';
+import { addMonths, parseISO, endOfDay, isBefore, startOfDay } from 'date-fns';
 import * as Yup from 'yup';
 
 import Enroll from '../models/Enroll';
@@ -49,7 +49,7 @@ class EnrollController {
     });
 
     if (enrollExists) {
-      return res.status(401).json({
+      return res.status(400).json({
         error:
           'Enroll student failed: This student is already enrolled to a gym.',
       });
@@ -70,7 +70,7 @@ class EnrollController {
     }
 
     const price = plan.duration * plan.price;
-    const end_date = endOfDay(addMonths(parseISO(start_date), plan.duration));
+    const end_date = addMonths(parseISO(start_date), plan.duration);
 
     const enroll = await Enroll.create({
       student_id,

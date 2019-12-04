@@ -49,7 +49,7 @@ export default function Enrollments() {
       return;
     }
 
-    await api.delete(`enrollments/${id}`);
+    await api.delete(`enrolls/${id}`);
     handleEnrollments();
     toast.success('Matrícula apagada com sucesso!');
   }

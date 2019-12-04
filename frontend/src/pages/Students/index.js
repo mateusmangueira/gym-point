@@ -18,15 +18,14 @@ export default function Students() {
   useEffect(() => {
     async function handleStudents() {
       const response = await api.get('students');
-
       setStudents(response.data);
     }
 
     handleStudents();
   }, []);
 
-  async function handleDelete({ name, id }) {
-    const confirm = window.confirm(`Deseja mesmo apagar o aluno, ${name} ?`);
+  async function handleDelete({ id }) {
+    const confirm = window.confirm('Deseja mesmo apagar o aluno?');
 
     if (!confirm) {
       toast.error('Aluno não apagado');
@@ -58,8 +57,8 @@ export default function Students() {
     getStudent();
   }, [search]);
 
-  async function handleSearchStudent(e) {
-    setSearch(e.target.value);
+  async function handleSearchStudent(student) {
+    setSearch(student.target.value);
   }
 
   return (
@@ -77,7 +76,7 @@ export default function Students() {
             <MdSearch color="#999" size={16} />
             <Input
               onChange={handleSearchStudent}
-              name="aluno"
+              name="student"
               type="text"
               placeholder="Buscar aluno"
             />
@@ -107,10 +106,10 @@ export default function Students() {
                         pathname: `/students/edit/${student.name}`,
                       }}
                     >
-                      editar
+                      Editar
                     </Link>
                     <button type="button" onClick={() => handleDelete(student)}>
-                      apagar
+                      Apagar
                     </button>
                   </div>
                 </td>

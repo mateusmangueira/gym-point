@@ -1,43 +1,65 @@
 import React, { useEffect, useState } from 'react';
-
-import { Link } from 'react-router-dom';
+import { toast } from 'react-toastify';
 
 import api from '~/services/api';
+import history from '~/services/history';
 
+import ButtonRegister from '~/components/ButtonRegister';
 import { Container, Content, HelpTable } from './styles';
 
-export default function HelpOrders() {
-  const [helpOrders, setHelpOrders] = useState([]);
+export default function Plans() {
+  const [orders, setOrders] = useState([]);
 
-  async function handleHelpOrders() {
+  async function handleOrders() {
     const response = await api.get('help-orders');
-    setHelpOrders(response.data);
+
+    setOrders(response.data);
   }
 
   useEffect(() => {
-    handleHelpOrders();
+    handleOrders();
   }, []);
+
+  async function answerOrder({ id }) {
+    try {
+      await api.post(`help-orders/${id}`);
+      handleOrders();
+
+      toast.success('Ordem respondida com sucesso!');
+    } catch (err) {
+      toast.error('Houve um erro na resposta do pedido, verifique os dados');
+    }
+  }
 
   return (
     <Container>
       <Content>
         <header>
-          <h1>Gerenciando planos</h1>
+          <h1>Gerenciando pedidos de ajuda</h1>
+          <ButtonRegister
+            type="button"
+            onClick={() => {
+              history.push('/help-orders/register');
+            }}
+          />
         </header>
 
         <HelpTable>
           <thead>
             <tr>
-              <th>Pedido de auxílio</th>
+              <th>Pedido de Ajuda</th>
             </tr>
           </thead>
           <tbody>
-            {helpOrders.map(helpOrder => (
-              <tr key={helpOrder.id}>
-                <td>{helpOrder.student.name}</td>
+            {orders.map(order => (
+              <tr key={order.id}>
+                <td>{order.question}</td>
+
                 <td>
                   <div>
-                    <Link>responder</Link>
+                    <button type="button" onClick={() => answerOrder(order)}>
+                      Apagar
+                    </button>
                   </div>
                 </td>
               </tr>

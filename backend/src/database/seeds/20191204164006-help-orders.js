@@ -7,7 +7,7 @@ module.exports = {
           student_id: '1',
           question: 'Oi, essa acad deixa giga biga?',
           answer: null,
-          answer_at: new Date(),
+          answer_at: null,
           created_at: new Date(),
           updated_at: new Date(),
         },

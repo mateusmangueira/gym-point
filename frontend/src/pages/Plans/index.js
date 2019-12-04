@@ -84,10 +84,10 @@ export default function Plans() {
                         pathname: `/plans/edit/${plan.id}`,
                       }}
                     >
-                      editar
+                      Editar
                     </Link>
                     <button type="button" onClick={() => handleDelete(plan)}>
-                      apagar
+                      Apagar
                     </button>
                   </div>
                 </td>

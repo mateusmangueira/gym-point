@@ -66,7 +66,7 @@ export default function Register() {
       });
 
       toast.success('Matrícula realizada com sucesso!');
-      history.push('/');
+      history.push('/enrollments');
     } catch (err) {
       toast.error('Aluno já possui uma matrícula!');
     }

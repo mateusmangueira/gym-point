@@ -77,7 +77,7 @@ export const BoxIcon = styled.div`
   background: #fff;
 `;
 
-export const Items = styled.div`
+export const ListHelpOrders = styled.div`
   padding: 20px 40px;
   background-color: #fff;
   border-radius: 5px;

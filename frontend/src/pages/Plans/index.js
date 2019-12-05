@@ -1,29 +1,50 @@
-import React, { useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import React, { useEffect, useState } from 'react';
+import { useDispatch } from 'react-redux';
 import { Link } from 'react-router-dom';
+
+import api from '../../services/api';
 import history from '~/services/history';
+import { formatPrice } from '../../util/format';
 
 import ButtonRegister from '~/components/ButtonRegister';
 import { Container, Content, PlanTable } from './styles';
 
-import {
-  handlePlansRequest,
-  deletePlanRequest,
-} from '~/store/modules/plan/actions';
+import { deletePlanRequest } from '~/store/modules/plan/actions';
 
 export default function Plans() {
   const dispatch = useDispatch();
-  const plans = useSelector(state => state.plan.plans) || [];
+  const [plans, setPlans] = useState([]);
+
+  async function handlePlans() {
+    const response = await api.get('plans');
+
+    const data = response.data.map(plan => {
+      plan.priceFormated = formatPrice(plan.price);
+      if (plan.duration === 1) {
+        plan.durationFormated = '1 mês';
+      } else {
+        plan.durationFormated = `${plan.duration} meses`;
+      }
+      return plan;
+    });
+
+    setPlans(data);
+  }
 
   useEffect(() => {
-    dispatch(handlePlansRequest(1));
-  }, []); // eslint-disable-line
+    handlePlans();
+  }, []);
 
   function handleDelete(id) {
     const result = window.confirm('Tem certeza que deseja deletar esse plano?');
     if (result) {
       dispatch(deletePlanRequest(id));
     }
+  }
+
+  function handleFormatPrice(price) {
+    const result = formatPrice(price);
+    return result;
   }
 
   return (
@@ -52,10 +73,10 @@ export default function Plans() {
               <tr key={plan.id}>
                 <td>{plan.title}</td>
                 <td align="center">
-                  {plan.durationFormated}{' '}
-                  {plan.durationFormated > 1 ? ' meses' : ' mês'}
+                  {plan.duration}
+                  {plan.duration > 1 ? ' meses' : ' mês'}
                 </td>
-                <td align="center">{plan.priceFormated}</td>
+                <td align="center">{handleFormatPrice(plan.price)}</td>
                 <td>
                   <div>
                     <Link
@@ -63,10 +84,10 @@ export default function Plans() {
                         pathname: `/plans/edit/${plan.id}`,
                       }}
                     >
-                      Editar
+                      editar
                     </Link>
                     <button type="button" onClick={() => handleDelete(plan.id)}>
-                      Apagar
+                      apagar
                     </button>
                   </div>
                 </td>

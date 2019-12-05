@@ -1,9 +1,6 @@
 import React from 'react';
+import { useDispatch } from 'react-redux';
 import * as Yup from 'yup';
-import { toast } from 'react-toastify';
-
-import history from '~/services/history';
-import api from '~/services/api';
 
 import Input from '~/components/Input';
 import ButtonBack from '~/components/ButtonBack';
@@ -11,6 +8,8 @@ import ButtonSave from '~/components/ButtonSave';
 import Form from '~/components/DefaultForm';
 
 import { Container } from './styles';
+
+import { createStudentRequest } from '~/store/modules/student/actions';
 
 const schema = Yup.object().shape({
   name: Yup.string().required('O nome é obrigatório'),
@@ -29,21 +28,10 @@ const schema = Yup.object().shape({
 });
 
 export default function Register() {
-  async function handleRegister({ name, email, age, height, weight }) {
-    try {
-      await api.post('/students', {
-        name,
-        email,
-        age,
-        height,
-        weight,
-      });
+  const dispatch = useDispatch();
 
-      history.goBack();
-      toast.success('Aluno criado com sucesso!');
-    } catch (err) {
-      toast.error('Já existe um aluno cadastrado com esse e-mail');
-    }
+  function handleRegister({ name, email, age, weight, height }) {
+    dispatch(createStudentRequest(name, email, age, weight, height));
   }
 
   return (
@@ -59,21 +47,21 @@ export default function Register() {
 
       <Form schema={schema} onSubmit={handleRegister} id="student-form">
         <span>NOME COMPLETO</span>
-        <Input name="name" type="text" placeholder="Nome completo do aluno" />
+        <Input name="name" type="text" placeholder="Nome completo" />
         <span>ENDEREÇO DE E-MAIL</span>
         <Input name="email" type="email" placeholder="exemplo@email.com" />
         <div>
           <div>
             <span>IDADE</span>
-            <Input name="age" type="text" />
+            <Input name="age" type="text" placeholder="Sua idade" />
           </div>
           <div>
             <span>PESO (em kg)</span>
-            <Input name="weight" type="text" />
+            <Input name="weight" type="text" placeholder="Seu peso" />
           </div>
           <div>
             <span>ALTURA</span>
-            <Input name="height" type="text" />
+            <Input name="height" type="text" placeholder="Sua altura" />
           </div>
         </div>
       </Form>

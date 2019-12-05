@@ -2,7 +2,7 @@ import produce from 'immer';
 
 const INITIAL_STATE = {
   enrollment: null,
-  enrollments: [],
+  allEnrollments: null,
 };
 
 export default function enrollment(state = INITIAL_STATE, action) {
@@ -19,12 +19,12 @@ export default function enrollment(state = INITIAL_STATE, action) {
       }
 
       case '@enrollment/ALL_ENROLLMENTS_SUCCESS': {
-        draftState.enrollments = action.payload.enrollments;
+        draftState.allEnrollments = action.payload.allEnrollments;
         break;
       }
 
       case '@enrollment/DELETE_ENROLLMENT_SUCCESS': {
-        draftState.enrollments = draftState.enrollments.filter(item => {
+        draftState.allEnrollments = draftState.allEnrollments.filter(item => {
           return item.id !== action.payload.id;
         });
         break;

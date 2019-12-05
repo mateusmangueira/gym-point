@@ -2,8 +2,9 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 import { Input, Form } from '@rocketseat/unform';
-import { Container, Content, Items, Nav } from './styles';
 import { Modal } from '~/components/Modal';
+
+import { Container, Content, ListHelpOrders, Nav } from './styles';
 
 import {
   helpOrdersRequest,
@@ -13,9 +14,9 @@ import {
 
 export default function HelpOrders() {
   const dispatch = useDispatch();
-  const helpOrders = useSelector(state => state.helpOrders) || [];
+  const helpOrders = useSelector(state => state.help_order.allHelpOrders) || [];
+  const [help] = useSelector(state => state.help_order.helpOrder) || [];
   const [showModal, setShowModal] = useState(false);
-  const [oneHelp] = useSelector(state => state.helpOrder) || [];
   const [question, setQuestion] = useState('');
 
   useEffect(() => {
@@ -25,10 +26,10 @@ export default function HelpOrders() {
   function handleOpenModal(id) {
     dispatch(oneHelpOrderRequest(id));
     setShowModal(!showModal);
-    if (oneHelp) {
-      setQuestion(oneHelp.question);
+    if (help) {
+      setQuestion(help.question);
     } else {
-      toast.warn('Problemas com os dados');
+      toast.error('Problemas com os dados');
     }
   }
 
@@ -37,7 +38,7 @@ export default function HelpOrders() {
   }
 
   function handleAnswer({ answer }) {
-    dispatch(answerHelpOrderRequest(answer, oneHelp.id));
+    dispatch(answerHelpOrderRequest(answer, help.id));
   }
 
   return (
@@ -55,17 +56,17 @@ export default function HelpOrders() {
             <Input
               name="answer"
               type="text"
-              placeholder="Digite sua resposta"
+              placeholder="Digite uma resposta"
               autoComplete="off"
               multiline
             />
             <button type="submit" onClick={hideModal}>
-              Responder pedido
+              Responder Aluno
             </button>
           </Form>
         </Modal>
 
-        <Items>
+        <ListHelpOrders>
           <table>
             <thead>
               <tr>
@@ -91,7 +92,7 @@ export default function HelpOrders() {
               ))}
             </tbody>
           </table>
-        </Items>
+        </ListHelpOrders>
       </Content>
     </Container>
   );

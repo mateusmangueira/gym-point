@@ -2,7 +2,7 @@ import produce from 'immer';
 
 const INITIAL_STATE = {
   plan: null,
-  plans: null,
+  allPlans: null,
 };
 
 export default function plan(state = INITIAL_STATE, action) {
@@ -18,13 +18,8 @@ export default function plan(state = INITIAL_STATE, action) {
         break;
       }
 
-      case '@plan/LOAD_ALL_PLANS_SUCCESS': {
-        draftState.plans = action.payload.plans;
-        break;
-      }
-
       case '@plan/DELETE_PLAN_SUCCESS': {
-        draftState.plans = draftState.plans.filter(item => {
+        draftState.allPlans = draftState.allPlans.filter(item => {
           return item.id !== action.payload.id;
         });
         break;

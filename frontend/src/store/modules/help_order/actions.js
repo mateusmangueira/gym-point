@@ -24,10 +24,10 @@ export function helpOrdersRequest() {
   };
 }
 
-export function helpOrdersSuccess(helpOrders) {
+export function helpOrdersSuccess(allHelpOrders) {
   return {
     type: '@help_order/HELP_ORDERS_SUCCESS',
-    payload: { helpOrders },
+    payload: { allHelpOrders },
   };
 }
 
@@ -57,7 +57,7 @@ export function oneHelpOrderFailure() {
   };
 }
 
-export function loadAllNotAnsweredHelpordersRequest() {
+export function notAnsweredHelpordersRequest() {
   return {
     type: '@help_order/NOT_ANSWERED_HELP_ORDERS_REQUEST',
   };

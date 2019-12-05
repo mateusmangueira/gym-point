@@ -45,6 +45,7 @@ routes.put('/enrolls/:id', EnrollController.update); // Teste ok
 routes.delete('/enrolls/:id', EnrollController.delete); // Teste ok
 
 routes.get('/help-orders', HelpOrderController.index); // Teste ok
+routes.get('/help-orders/:id', HelpOrderController.show);
 routes.post('/help-orders/:id/answer', HelpOrderController.store); // Teste ok
 
 export default routes;

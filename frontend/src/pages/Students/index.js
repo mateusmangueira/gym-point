@@ -1,41 +1,57 @@
-import React, { useState, useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import React, { useEffect, useState, useMemo } from 'react';
+import { useDispatch } from 'react-redux';
 
 import { Link } from 'react-router-dom';
-
 import { MdSearch } from 'react-icons/md';
 
 import Input from '~/components/Input';
 import ButtonRegister from '~/components/ButtonRegister';
 
-import history from '~/services/history';
 import { Container, Search, ListStudents } from './styles';
 
-import {
-  handleStudentsRequest,
-  deleteStudentRequest,
-} from '../../store/modules/student/actions';
+import api from '~/services/api';
+import history from '~/services/history';
+
+import { deleteStudentRequest } from '../../store/modules/student/actions';
 
 export default function Students() {
   const dispatch = useDispatch();
-  const students = useSelector(state => state.student.students) || [];
+  const [students, setStudents] = useState([]);
   const [search, setSearch] = useState('');
 
   useEffect(() => {
-    dispatch(handleStudentsRequest(null, 1));
-  }, []); // eslint-disable-line
+    async function handleStudents() {
+      const response = await api.get('students');
 
-  useEffect(() => {
-    if (search !== null) {
-      dispatch(handleStudentsRequest(search, null));
+      setStudents(response.data);
     }
-  }, [search]); // eslint-disable-line
 
-  function handleDelete(id) {
-    const result = window.confirm('Tem certeza que deseja excluir esse campo?');
+    handleStudents();
+  }, []);
+
+  async function handleDelete(id) {
+    const result = window.confirm('Tem certeza que deseja apagar esse aluno?');
     if (result) {
       dispatch(deleteStudentRequest(id));
     }
+  }
+
+  useMemo(() => {
+    async function getStudent() {
+      const response = await api.get('students', {
+        params: {
+          q: search,
+        },
+      });
+
+      setStudents(response.data);
+    }
+
+    getStudent();
+  }, [search]);
+
+  async function handleStudentSearch(e) {
+    setSearch(e.target.value);
   }
 
   return (
@@ -53,7 +69,7 @@ export default function Students() {
             <MdSearch color="#999" size={16} />
             <Input
               checked={search}
-              onChange={e => setSearch(e.target.value)}
+              onChange={handleStudentSearch}
               name="search"
               type="text"
               placeholder="Buscar aluno"
@@ -81,16 +97,16 @@ export default function Students() {
                   <div>
                     <Link
                       to={{
-                        pathname: `/students/edit/${student.name}`,
+                        pathname: `/students/edit/${student.id}`,
                       }}
                     >
-                      Editar
+                      editar
                     </Link>
                     <button
                       type="button"
                       onClick={() => handleDelete(student.id)}
                     >
-                      Apagar
+                      apagar
                     </button>
                   </div>
                 </td>

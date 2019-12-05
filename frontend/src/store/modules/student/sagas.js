@@ -9,8 +9,6 @@ import {
   createStudentFailure,
   updateStudentSuccess,
   updateStudentFailure,
-  handleStudentsSuccess,
-  handleStudentsFailure,
   deleteStudentSuccess,
   deleteStudentFailure,
 } from './actions';
@@ -54,48 +52,21 @@ export function* updateStudent({ payload }) {
   }
 }
 
-export function* handleStudents({ payload }) {
-  try {
-    const { search, page } = payload;
-    let response = null;
-
-    if (page) {
-      response = yield api.get('students', {
-        params: {
-          page,
-        },
-      });
-    } else if (search) {
-      response = yield api.get(`students?q=${payload.search}`);
-    } else {
-      response = yield api.get('students');
-    }
-
-    if (response) {
-      yield put(handleStudentsSuccess(response.data));
-    }
-  } catch (error) {
-    if (error.response.status === 400) {
-      toast.warn('Você possui nenhum aluno');
-    } else {
-      toast.error('Houve algum erro ao carregar os alunos');
-    }
-    yield put(handleStudentsFailure());
-  }
-}
-
 export function* deleteStudent({ payload }) {
   try {
     const { id } = payload;
-    yield call(api.delete, `/students`, {
-      headers: { id },
-    });
+    const response = yield call(api.delete, `/students/${id}`);
 
-    yield put(deleteStudentSuccess(id));
-    toast.warn('Aluno deletado.');
+    if (response) {
+      toast.warn('Aluno deletado com sucesso.');
+    } else {
+      toast.error('Houve algum problema ao deletar o aluno');
+    }
+
+    yield put(deleteStudentSuccess(response.data));
+
     history.push('/students');
   } catch (error) {
-    toast.error('Houve algum erro ao deleta o aluno');
     yield put(deleteStudentFailure());
   }
 }
@@ -103,6 +74,5 @@ export function* deleteStudent({ payload }) {
 export default all([
   takeLatest('@student/CREATE_STUDENT_REQUEST', createStudent),
   takeLatest('@student/UPDATE_STUDENT_REQUEST', updateStudent),
-  takeLatest('@student/LOAD_ALL_STUDENTS_REQUEST', handleStudents),
   takeLatest('@student/DELETE_STUDENT_REQUEST', deleteStudent),
 ]);

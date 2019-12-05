@@ -4,6 +4,7 @@ const INITIAL_STATE = {
   token: null,
   signed: false,
   loading: false,
+  name: '',
 };
 
 export default function auth(state = INITIAL_STATE, action) {
@@ -15,6 +16,7 @@ export default function auth(state = INITIAL_STATE, action) {
       }
       case '@auth/SIGN_IN_SUCCESS': {
         draftState.token = action.payload.token;
+        draftState.name = action.payload.user.name;
         draftState.signed = true;
         draftState.loading = false;
         break;
@@ -26,6 +28,7 @@ export default function auth(state = INITIAL_STATE, action) {
       case '@auth/SIGN_OUT': {
         draftState.token = null;
         draftState.signed = false;
+        draftState.name = 'Deslogado';
         break;
       }
       default:

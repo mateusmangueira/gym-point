@@ -2,7 +2,7 @@ import produce from 'immer';
 
 const INITIAL_STATE = {
   student: null,
-  students: null,
+  allStudents: null,
 };
 
 export default function student(state = INITIAL_STATE, action) {
@@ -18,13 +18,8 @@ export default function student(state = INITIAL_STATE, action) {
         break;
       }
 
-      case '@student/ALL_STUDENTS_SUCCESS': {
-        draftState.students = action.payload.students;
-        break;
-      }
-
       case '@student/DELETE_STUDENT_SUCCESS': {
-        draftState.students = draftState.students.filter(item => {
+        draftState.allStudents = draftState.allStudents.filter(item => {
           return item.id !== action.payload.id;
         });
         break;

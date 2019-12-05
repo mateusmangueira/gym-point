@@ -2,8 +2,8 @@ import { takeLatest, call, put, all } from 'redux-saga/effects';
 import { toast } from 'react-toastify';
 import { isBefore, setHours, setMinutes } from 'date-fns';
 
-import api from '../../../services/api';
-import history from '../../../services/history';
+import api from '~/services/api';
+import history from '~/services/history';
 
 import {
   createEnrollmentSuccess,
@@ -25,7 +25,10 @@ export function* createEnrollment({ payload }) {
       return;
     }
 
-    const response = yield call(api.post, '/enrolls', payload);
+    const response = yield call(api.post, '/enrolls', {
+      start_date,
+      active: true,
+    });
 
     toast.success('Matrícula efetuada com sucesso.');
 
@@ -70,40 +73,32 @@ export function* updateEnrollment({ payload }) {
 export function* deleteEnrollment({ payload }) {
   try {
     const { id } = payload;
-    yield call(api.delete, `/enrolls/${id}`);
-
-    yield put(deleteEnrollmentSuccess(id));
-    toast.warn('Matrícula deletada com sucesso.');
+    const response = yield call(api.delete, `/enrolls/${id}`);
+    if (response) {
+      toast.warn('Matrícula deletada com sucesso.');
+      yield put(deleteEnrollmentSuccess(id));
+    } else {
+      toast.error('Houve um erro em deletar a matrícula');
+    }
     history.push('/enrollments');
   } catch (error) {
-    toast.error('Houve um erro em deletar a matrícula');
     yield put(deleteEnrollmentFailure());
   }
 }
 
-export function* handleEnrollments({ payload }) {
+export function* handleEnrollments() {
   try {
-    let response = [];
-    const { page } = payload;
-
-    if (page) {
-      response = yield api.get('enrollments', {
-        params: {
-          page,
-        },
-      });
-    } else {
-      response = yield api.get('enrollments');
-    }
-
+    const response = yield api.get('enrollments');
     if (response) {
       yield put(handleEnrollmentSuccess(response.data));
     }
   } catch (error) {
     if (error.response.status === 400) {
-      toast.warn('Não existem matrículas cadastradas.');
+      toast.warn('Você possui nenhuma matrícula');
     } else {
-      toast.error('Houve um erro ao carregar as matrículas');
+      toast.error(
+        'Houve algum erro ao carregar as matrículas, tente novamente mais tarde.'
+      );
     }
     yield put(handleEnrollmentFailure());
   }
@@ -111,7 +106,7 @@ export function* handleEnrollments({ payload }) {
 
 export default all([
   takeLatest('@enrollment/CREATE_ENROLLMENT_REQUEST', createEnrollment),
-  takeLatest('@registration/UPDATE_ENROLLMENT_REQUEST', updateEnrollment),
-  takeLatest('@registration/ALL_ENROLLMENTS_REQUEST', handleEnrollments),
-  takeLatest('@registration/DELETE_ENROLLMENT_REQUEST', deleteEnrollment),
+  takeLatest('@enrollment/UPDATE_ENROLLMENT_REQUEST', updateEnrollment),
+  takeLatest('@enrollment/ALL_ENROLLMENTS_REQUEST', handleEnrollments),
+  takeLatest('@enrollment/DELETE_ENROLLMENT_REQUEST', deleteEnrollment),
 ]);

@@ -2,29 +2,24 @@ import produce from 'immer';
 
 const INITIAL_STATE = {
   helpOrder: null,
-  helpOrders: null,
+  allHelpOrders: null,
 };
 
-export default function helporder(state = INITIAL_STATE, action) {
+export default function help_order(state = INITIAL_STATE, action) {
   return produce(state, draftState => {
     switch (action.type) {
       case '@help_order/ANSWER_HELP_ORDER_SUCCESS': {
-        draftState.helporder = action.payload.helporder;
+        draftState.helpOrder = action.payload.helpOrder;
         break;
       }
 
       case '@help_order/HELP_ORDERS_SUCCESS': {
-        draftState.helpOrders = action.payload.helpOrders;
+        draftState.allHelpOrders = action.payload.allHelpOrders;
         break;
       }
 
       case '@help_order/NOT_ANSWERED_HELP_ORDERS_SUCCESS': {
-        draftState.helpOrders = action.payload.helpOrders;
-        break;
-      }
-
-      case '@help_order/ONE_HELP_ORDER_SUCCESS': {
-        draftState.helpOrder = action.payload.helpOrder;
+        draftState.allHelpOrders = action.payload.allHelpOrders;
         break;
       }
       default:

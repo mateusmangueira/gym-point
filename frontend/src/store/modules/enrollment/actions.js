@@ -38,17 +38,16 @@ export function updateEnrollmentFailure() {
   };
 }
 
-export function handleEnrollmentRequest(page) {
+export function handleEnrollmentRequest() {
   return {
     type: '@enrollment/ALL_ENROLLMENTS_REQUEST',
-    payload: { page },
   };
 }
 
-export function handleEnrollmentSuccess(enrollments) {
+export function handleEnrollmentSuccess(allEnrollments) {
   return {
     type: '@enrollment/ALL_ENROLLMENTS_SUCCESS',
-    payload: { enrollments },
+    payload: { allEnrollments },
   };
 }
 

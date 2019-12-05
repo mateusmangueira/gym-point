@@ -16,11 +16,15 @@ export function* answerOrder({ payload }) {
   try {
     const { id } = payload;
 
-    const response = yield call(api.post, `/help-orders/${id}/answer`, payload);
+    const response = yield call(api.post, `/help-orders/${id}/answer`, {
+      id,
+      answer_at: new Date(),
+    });
 
-    toast.success('Pedido respondido com sucesso.');
-
-    yield put(answerHelpOrderSuccess(response.data));
+    if (response) {
+      toast.success('Pedido de auxílio respondido com sucesso.');
+      yield put(answerHelpOrderSuccess(response.data));
+    }
   } catch (error) {
     toast.error('Houve um erro no resposta do pedido.');
     yield put(answerHelpOrderFailure());
@@ -38,7 +42,7 @@ export function* handleHelpOrders() {
       toast.warn('Não existem pedidos de auxílio');
     } else {
       toast.error(
-        `Erro na requisição de pedidos de auxílio: ${error.response.data.error}`
+        'Houve um erro no carregamento dos pedidos de auxílio, tente novamente mais'
       );
     }
     yield put(helpOrdersFailure());

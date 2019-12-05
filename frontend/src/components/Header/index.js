@@ -1,16 +1,20 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { Link, NavLink } from 'react-router-dom';
 
 import logo from '~/assets/logo.svg';
 import { Container, Content, Profile, Logo, Navigation } from './styles';
 
+import { store } from '../../store';
+
 import { signOut } from '../../store/modules/auth/actions';
 
 export default function Header() {
-  const student = useSelector(state => state.student.students) || [];
-
   const dispatch = useDispatch();
+
+  const { signed } = useSelector(state => state.auth);
+
+  const authName = useMemo(() => store.getState().auth.name, [signed]); // eslint-disable-line
 
   function handleSignOut() {
     dispatch(signOut());
@@ -34,7 +38,7 @@ export default function Header() {
 
         <aside>
           <Profile>
-            <strong>{student.name} </strong>
+            <strong>{authName}</strong>
             <button type="button" onClick={handleSignOut}>
               sair do sistema
             </button>

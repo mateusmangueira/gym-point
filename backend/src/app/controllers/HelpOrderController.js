@@ -26,6 +26,14 @@ class HelpOrderController {
     return res.json(helpOrders);
   }
 
+  async show(res, req) {
+    const { id } = req.params;
+
+    const helpOrder = await HelpOrder.findByPk(id);
+
+    return res.json(helpOrder);
+  }
+
   async store(req, res) {
     const schema = Yup.object().shape({
       answer: Yup.string().required(),

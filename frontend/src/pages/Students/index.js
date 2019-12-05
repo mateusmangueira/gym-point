@@ -1,5 +1,6 @@
-import React, { useState, useEffect, useMemo } from 'react';
-import { toast } from 'react-toastify';
+import React, { useState, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+
 import { Link } from 'react-router-dom';
 
 import { MdSearch } from 'react-icons/md';
@@ -7,58 +8,34 @@ import { MdSearch } from 'react-icons/md';
 import Input from '~/components/Input';
 import ButtonRegister from '~/components/ButtonRegister';
 
-import api from '~/services/api';
 import history from '~/services/history';
 import { Container, Search, ListStudents } from './styles';
 
+import {
+  handleStudentsRequest,
+  deleteStudentRequest,
+} from '../../store/modules/student/actions';
+
 export default function Students() {
-  const [students, setStudents] = useState([]);
+  const dispatch = useDispatch();
+  const students = useSelector(state => state.student.students) || [];
   const [search, setSearch] = useState('');
 
   useEffect(() => {
-    async function handleStudents() {
-      const response = await api.get('students');
-      setStudents(response.data);
+    dispatch(handleStudentsRequest(null, 1));
+  }, []); // eslint-disable-line
+
+  useEffect(() => {
+    if (search !== null) {
+      dispatch(handleStudentsRequest(search, null));
     }
+  }, [search]); // eslint-disable-line
 
-    handleStudents();
-  }, []);
-
-  async function handleDelete({ id }) {
-    const confirm = window.confirm('Deseja mesmo apagar o aluno?');
-
-    if (!confirm) {
-      toast.error('Aluno não apagado');
-      return;
+  function handleDelete(id) {
+    const result = window.confirm('Tem certeza que deseja excluir esse campo?');
+    if (result) {
+      dispatch(deleteStudentRequest(id));
     }
-
-    try {
-      await api.delete(`students/${id}`);
-      const response = await api.get('students');
-      setStudents(response.data);
-
-      toast.success('Aluno apagado com sucesso!');
-    } catch (error) {
-      toast.error('Aluno tem uma matrícula ativa');
-    }
-  }
-
-  useMemo(() => {
-    async function getStudent() {
-      const response = await api.get('students', {
-        params: {
-          q: search,
-        },
-      });
-
-      setStudents(response.data);
-    }
-
-    getStudent();
-  }, [search]);
-
-  async function handleSearchStudent(student) {
-    setSearch(student.target.value);
   }
 
   return (
@@ -75,8 +52,9 @@ export default function Students() {
           <Search>
             <MdSearch color="#999" size={16} />
             <Input
-              onChange={handleSearchStudent}
-              name="student"
+              checked={search}
+              onChange={e => setSearch(e.target.value)}
+              name="search"
               type="text"
               placeholder="Buscar aluno"
             />
@@ -108,7 +86,10 @@ export default function Students() {
                     >
                       Editar
                     </Link>
-                    <button type="button" onClick={() => handleDelete(student)}>
+                    <button
+                      type="button"
+                      onClick={() => handleDelete(student.id)}
+                    >
                       Apagar
                     </button>
                   </div>

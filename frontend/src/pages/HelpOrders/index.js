@@ -1,71 +1,97 @@
 import React, { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
+import { Input, Form } from '@rocketseat/unform';
+import { Container, Content, Items, Nav } from './styles';
+import { Modal } from '~/components/Modal';
 
-import api from '~/services/api';
-import history from '~/services/history';
+import {
+  helpOrdersRequest,
+  oneHelpOrderRequest,
+  answerHelpOrderRequest,
+} from '../../store/modules/help_order/actions';
 
-import ButtonRegister from '~/components/ButtonRegister';
-import { Container, Content, HelpTable } from './styles';
-
-export default function Plans() {
-  const [orders, setOrders] = useState([]);
-
-  async function handleOrders() {
-    const response = await api.get('help-orders');
-
-    setOrders(response.data);
-  }
+export default function HelpOrders() {
+  const dispatch = useDispatch();
+  const helpOrders = useSelector(state => state.helpOrders) || [];
+  const [showModal, setShowModal] = useState(false);
+  const [oneHelp] = useSelector(state => state.helpOrder) || [];
+  const [question, setQuestion] = useState('');
 
   useEffect(() => {
-    handleOrders();
-  }, []);
+    dispatch(helpOrdersRequest());
+  }, []); // eslint-disable-line
 
-  async function answerOrder({ id }) {
-    try {
-      await api.post(`help-orders/${id}`);
-      handleOrders();
-
-      toast.success('Ordem respondida com sucesso!');
-    } catch (err) {
-      toast.error('Houve um erro na resposta do pedido, verifique os dados');
+  function handleOpenModal(id) {
+    dispatch(oneHelpOrderRequest(id));
+    setShowModal(!showModal);
+    if (oneHelp) {
+      setQuestion(oneHelp.question);
+    } else {
+      toast.warn('Problemas com os dados');
     }
+  }
+
+  function hideModal() {
+    setShowModal(!showModal);
+  }
+
+  function handleAnswer({ answer }) {
+    dispatch(answerHelpOrderRequest(answer, oneHelp.id));
   }
 
   return (
     <Container>
       <Content>
-        <header>
-          <h1>Gerenciando pedidos de ajuda</h1>
-          <ButtonRegister
-            type="button"
-            onClick={() => {
-              history.push('/help-orders/register');
-            }}
-          />
-        </header>
+        <Nav>
+          <strong>Pedidos de auxílio</strong>
+        </Nav>
 
-        <HelpTable>
-          <thead>
-            <tr>
-              <th>Pedido de Ajuda</th>
-            </tr>
-          </thead>
-          <tbody>
-            {orders.map(order => (
-              <tr key={order.id}>
-                <td>{order.question}</td>
+        <Modal show={showModal} handleClose={hideModal}>
+          <Form onSubmit={handleAnswer}>
+            <p>Pergunta do Aluno</p>
+            <p className="question">{question}</p>
+            <p>Sua resposta</p>
+            <Input
+              name="answer"
+              type="text"
+              placeholder="Digite sua resposta"
+              autoComplete="off"
+              multiline
+            />
+            <button type="submit" onClick={hideModal}>
+              Responder pedido
+            </button>
+          </Form>
+        </Modal>
 
-                <td>
-                  <div>
-                    <button type="button" onClick={() => answerOrder(order)}>
-                      Apagar
-                    </button>
-                  </div>
-                </td>
+        <Items>
+          <table>
+            <thead>
+              <tr>
+                <th className="align-left">ALUNO</th>
+                {/* eslint-disable-next-line jsx-a11y/control-has-associated-label */}
+                <th />
               </tr>
-            ))}
-          </tbody>
-        </HelpTable>
+            </thead>
+            <tbody>
+              {helpOrders.map(help => (
+                <tr key={help.id}>
+                  <td className="align-left">{help.student.name}</td>
+                  <td className="answer">
+                    <button
+                      className="help"
+                      type="button"
+                      onClick={() => handleOpenModal(help.id)}
+                    >
+                      Responder
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </Items>
       </Content>
     </Container>
   );

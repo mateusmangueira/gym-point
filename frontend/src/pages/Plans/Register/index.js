@@ -1,18 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { toast } from 'react-toastify';
+import { useDispatch } from 'react-redux';
 
 import * as Yup from 'yup';
-import { Container, Content } from './styles';
 
-import api from '~/services/api';
-import history from '~/services/history';
+import { formatPrice } from '~/util/format';
+
+import { Container, Content } from './styles';
 
 import ButtonBack from '~/components/ButtonBack';
 import ButtonSave from '~/components/ButtonSave';
 import Form from '~/components/DefaultForm';
 import Input from '~/components/Input';
 
-import { formatPrice } from '~/util/format';
+import { createPlanRequest } from '~/store/modules/plan/actions';
 
 const schema = Yup.object().shape({
   title: Yup.string().required('O título é obrigatório'),
@@ -26,6 +26,7 @@ const schema = Yup.object().shape({
 });
 
 export default function Register() {
+  const dispatch = useDispatch();
   const [priceForm, setPriceForm] = useState('0');
   const [durationForm, setDurationForm] = useState('0');
   const [totalPrice, setTotalPrice] = useState('');
@@ -34,19 +35,8 @@ export default function Register() {
     setTotalPrice(formatPrice(priceForm * durationForm || 0));
   }, [durationForm, priceForm]);
 
-  async function handleSubmit({ title, duration, price }) {
-    try {
-      await api.post('plans', {
-        title,
-        duration,
-        price,
-      });
-
-      history.goBack();
-      toast.success('Plano criado com sucesso!');
-    } catch (err) {
-      toast.error('Existe um outro plano com este título');
-    }
+  function handleSubmit({ title, duration, price }) {
+    dispatch(createPlanRequest(title, duration, price));
   }
 
   return (

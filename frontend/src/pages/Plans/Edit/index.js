@@ -1,16 +1,15 @@
-import React, { useEffect, useState } from 'react';
-import { toast } from 'react-toastify';
+import React, { useEffect, useState, useMemo } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+
 import PropTypes from 'prop-types';
 import * as Yup from 'yup';
 
-import api from '~/services/api';
-import history from '~/services/history';
-
-import { formatPrice } from '~/util/format';
 import ButtonBack from '~/components/ButtonBack';
 import ButtonSave from '~/components/ButtonSave';
 import Form from '~/components/DefaultForm';
 import Input from '~/components/Input';
+
+import { updatePlanRequest } from '../../../store/modules/plan/actions';
 
 import { Container } from './styles';
 
@@ -25,53 +24,37 @@ const schema = Yup.object().shape({
 });
 
 export default function Edit({ match }) {
+  const dispatch = useDispatch();
+
+  const [planDuration, setPlanDuration] = useState(0);
+
+  const [planPrice, setPlanPrice] = useState(0);
+
+  const [total, setTotal] = useState(0);
+
   const { id } = match.params;
-  const [plan, setPlan] = useState({});
+
+  const onePlan = useSelector(state => {
+    return state.plan.plans.find(item => {
+      return item.id.toString() === id;
+    });
+  }) || { title: 'Digite um plano', duration: 1, price: 1 };
 
   useEffect(() => {
-    async function handlePlan() {
-      const response = await api.get('plans');
-
-      const planEdit = response.data.find(p => p.id === Number(id));
-      planEdit.totalPrice = formatPrice(planEdit.duration * planEdit.price);
-      /* planEdit.priceFormated = formatPrice(planEdit.price); */
-      setPlan(planEdit);
+    if (planDuration || planPrice) {
+      setTotal(
+        (planDuration || onePlan.duration) * (planPrice || onePlan.price)
+      );
+    } else {
+      setTotal(onePlan.duration * onePlan.price);
     }
+  }, [planDuration, planPrice]); // eslint-disable-line
 
-    handlePlan();
-  }, [id]);
-
-  function handlePlanDuration(e) {
-    const duration = e.target.value;
-
-    const data = { ...plan };
-    const totalPrice = duration * data.price;
-
-    data.totalPrice = formatPrice(totalPrice || 0);
-
-    setPlan(data);
+  function handleSubmit({ title, duration, price }) {
+    dispatch(updatePlanRequest(title, duration, price, id));
   }
 
-  function handlePlanPrice(e) {
-    const price = e.target.value;
-
-    const data = { ...plan };
-    const totalPrice = data.duration * price;
-
-    data.totalPrice = formatPrice(totalPrice || 0);
-    setPlan(data);
-  }
-
-  async function handleSubmit({ title, duration, price }) {
-    await api.put(`plans/${id}`, {
-      title,
-      duration,
-      price,
-    });
-
-    history.goBack();
-    toast.success('Plano editado com sucesso!');
-  }
+  const priceCurrency = useMemo(() => `R$ ${total.toFixed(2)}`, [total]);
 
   return (
     <Container>
@@ -86,7 +69,7 @@ export default function Edit({ match }) {
 
       <Form
         schema={schema}
-        initialData={plan}
+        initialData={onePlan}
         onSubmit={handleSubmit}
         id="plan-form"
       >
@@ -96,22 +79,29 @@ export default function Edit({ match }) {
           <div>
             <span>DURAÇÃO (em meses)</span>
             <Input
+              checked={planDuration}
               name="duration"
-              type="text"
-              onChange={e => handlePlanDuration(e)}
+              type="number"
+              min="1"
+              step="1"
+              onChange={e => setPlanDuration(e.target.value)}
             />
           </div>
           <div>
             <span>PREÇO MENSAL</span>
             <Input
+              checked={planPrice}
               name="price"
-              type="price"
-              onChange={e => handlePlanPrice(e)}
+              type="number"
+              step="0.01"
+              min="0"
+              placeholder="R$ 0.00"
+              onChange={e => setPlanPrice(e.target.value)}
             />
           </div>
           <div>
             <span>PREÇO TOTAL</span>
-            <Input name="totalPrice" disabled />
+            <Input name="totalPrice" value={priceCurrency} disabled />
           </div>
         </div>
       </Form>

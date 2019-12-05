@@ -1,57 +1,39 @@
-import React, { useState, useEffect } from 'react';
-import { toast } from 'react-toastify';
-import { format, parseISO } from 'date-fns';
-import pt from 'date-fns/locale/pt';
+import React, { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+
 import { Link } from 'react-router-dom';
 
 import { MdCheckCircle } from 'react-icons/md';
-import api from '~/services/api';
+
 import history from '~/services/history';
 
 import { Container, Content, EnrollmentTable } from './styles';
 
 import ButtonRegister from '~/components/ButtonRegister';
 
+import {
+  handleEnrollmentRequest,
+  deleteEnrollmentRequest,
+} from '../../store/modules/enrollment/actions';
+
 export default function Enrollments() {
-  const [enrollments, setEnrollments] = useState([]);
+  const dispatch = useDispatch();
 
-  async function handleEnrollments() {
-    const response = await api.get('enrolls');
-
-    const data = response.data.map(enrollment => {
-      enrollment.startDateFormated = format(
-        parseISO(enrollment.start_date),
-        "dd 'de' MMMM 'de' yyyy",
-        { locale: pt }
-      );
-      enrollment.endDateFormated = format(
-        parseISO(enrollment.end_date),
-        "dd 'de' MMMM 'de' yyyy",
-        { locale: pt }
-      );
-      return enrollment;
-    });
-
-    setEnrollments(data);
-  }
+  const enrollments = useSelector(state => state.enrollment.enrollments) || [];
 
   useEffect(() => {
-    handleEnrollments();
-  }, []);
+    dispatch(handleEnrollmentRequest(1));
+  }, []); // eslint-disable-line
 
-  async function handleDelete({ id, student }) {
-    const confirm = window.confirm(
-      `Deseja mesmo apagar a matrícula de ${student.name}?\nIsso será permanente.`
+  useEffect(() => {}, [enrollments]); // eslint-disable-line
+
+  function handleDelete(id) {
+    const result = window.confirm(
+      'Tem certeza que deseja deletar essa matrícula?'
     );
-
-    if (!confirm) {
-      toast.error('Matrícula não foi apagada!');
-      return;
+    if (result) {
+      dispatch(deleteEnrollmentRequest(id));
     }
-
-    await api.delete(`enrolls/${id}`);
-    handleEnrollments();
-    toast.success('Matrícula apagada com sucesso!');
   }
 
   return (
@@ -94,7 +76,7 @@ export default function Enrollments() {
                     <Link to="/">Editar</Link>
                     <button
                       type="button"
-                      onClick={() => handleDelete(enrollment)}
+                      onClick={() => handleDelete(enrollment.id)}
                     >
                       Apagar
                     </button>

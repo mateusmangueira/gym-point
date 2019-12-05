@@ -8,7 +8,7 @@ import { Container, Content, Profile, Logo, Navigation } from './styles';
 import { signOut } from '../../store/modules/auth/actions';
 
 export default function Header() {
-  const profile = useSelector(state => state.user.profile);
+  const student = useSelector(state => state.student.students) || [];
 
   const dispatch = useDispatch();
 
@@ -34,7 +34,7 @@ export default function Header() {
 
         <aside>
           <Profile>
-            <strong>{profile.name} </strong>
+            <strong>{student.name} </strong>
             <button type="button" onClick={handleSignOut}>
               sair do sistema
             </button>

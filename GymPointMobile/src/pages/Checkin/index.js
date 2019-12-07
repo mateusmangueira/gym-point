@@ -71,7 +71,7 @@ export default function Checkin() {
           Novo check-in
         </Button>
         <NumberCheckins>
-          Checkins nos últimos 7 dias:
+          Check-in nos últimos 7 dias:
           {' '}
           <NumberBold>
             {numberCheckins}

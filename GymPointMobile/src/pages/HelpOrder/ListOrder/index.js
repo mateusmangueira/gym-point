@@ -91,7 +91,7 @@ export default function ListOrder({ navigation }) {
                       color={item.answer ? 'green' : 'rgba(0, 0, 0, 0.4)'}
                     />
                     <CardHeaderResponse answered={item.answer}>
-                      {item.answer ? 'Respondido' : 'Ainda sem resposta'}
+                      {item.answer ? 'Respondido' : 'Sem resposta'}
                     </CardHeaderResponse>
                   </CardHeaderLeft>
                   <CardHeaderDate>{item.formated}</CardHeaderDate>

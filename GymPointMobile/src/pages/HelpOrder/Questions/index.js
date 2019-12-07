@@ -44,7 +44,7 @@ export default function HelpOrderResponse({ navigation }) {
           <QuestionText>{question.question}</QuestionText>
           <ContentTitle>Resposta</ContentTitle>
           <ContentText>
-            {question.answer || 'Ainda sem resposta.'}
+            {question.answer || 'Sem resposta.'}
             {' '}
           </ContentText>
         </Content>

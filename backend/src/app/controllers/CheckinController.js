@@ -1,9 +1,8 @@
-import { subDays, isAfter } from 'date-fns';
-import { Op } from 'sequelize';
+import { subDays, isBefore } from 'date-fns';
+import * as Yup from 'yup';
 
 import Checkin from '../models/Checkin';
 import Student from '../models/Student';
-import Enroll from '../models/Enroll';
 
 class CheckinController {
   async index(req, res) {
@@ -26,33 +25,52 @@ class CheckinController {
   }
 
   async store(req, res) {
-    const { id } = req.params;
-
-    const isStudentAble = await Enroll.findOne({
-      where: { student_id: id },
+    const schema = Yup.object().shape({
+      student_id: Yup.number()
+        .required()
+        .integer()
+        .positive(),
     });
 
-    if (!isStudentAble || !isAfter(isStudentAble.end_date, new Date())) {
+    if (!(await schema.isValid(req.body))) {
       return res
-        .status(401)
-        .json({ error: 'You are not able to enroll this gym' });
+        .status(400)
+        .json({ error: 'Checkin store validation failed.' });
     }
 
-    const checkIns = await Checkin.findAll({
-      where: {
-        student_id: id,
-        created_at: { [Op.between]: [subDays(new Date(), 7), new Date()] },
-      },
+    const checkStudent = await Student.findByPk(req.body.student_id);
+    if (!checkStudent) {
+      return res
+        .status(400)
+        .json({ error: 'Student was not found to check-in.' });
+    }
+
+    const checkins = await Checkin.findAll({
+      where: { student_id: req.body.student_id },
     });
 
-    if (checkIns.length >= 5) {
-      return res
-        .status(401)
-        .json({ error: 'You can only check-in five times per week' });
-    }
-    const { student_id, created_at } = await Checkin.create({ student_id: id });
+    const todayMinusSeven = subDays(new Date(), 7);
+    let numberOfCheckin = 0;
 
-    return res.json({ id, student_id, created_at });
+    // eslint-disable-next-line no-restricted-syntax
+    for (const key in checkins) {
+      if (isBefore(todayMinusSeven, checkins[key].createdAt)) {
+        numberOfCheckin++;
+      }
+    }
+
+    if (numberOfCheckin >= 5) {
+      return res
+        .status(400)
+        .json({ error: 'Student already have 5 checkins in the last 7 days.' });
+    }
+
+    const newCheckin = await Checkin.create(req.body);
+
+    return res.json({
+      newCheckin,
+      checkin_count: numberOfCheckin,
+    });
   }
 
   async delete(req, res) {

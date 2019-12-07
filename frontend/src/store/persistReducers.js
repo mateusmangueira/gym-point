@@ -6,7 +6,7 @@ export default reducers => {
     {
       key: 'gympoint',
       storage,
-      whitelist: ['auth', 'enrollment', 'help_order', 'plan', 'student'],
+      whitelist: ['auth', 'enrollment', 'helpOrder', 'plan', 'student'],
     },
     reducers
   );

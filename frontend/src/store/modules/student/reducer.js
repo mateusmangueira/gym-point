@@ -2,7 +2,7 @@ import produce from 'immer';
 
 const INITIAL_STATE = {
   student: null,
-  allStudents: null,
+  allStudents: [],
 };
 
 export default function student(state = INITIAL_STATE, action) {
@@ -15,6 +15,11 @@ export default function student(state = INITIAL_STATE, action) {
 
       case '@student/UPDATE_STUDENT_SUCCESS': {
         draftState.student = action.payload.student;
+        break;
+      }
+
+      case '@student/LOAD_ALL_STUDENTS_SUCCESS': {
+        draftState.allStudents = action.payload.allStudents;
         break;
       }
 

@@ -4,8 +4,8 @@ module.exports = {
       'students',
       [
         {
-          name: 'Mateus Aluno Teste',
-          email: 'alunoteste@gmail.com',
+          name: 'Mateus',
+          email: 'mateus@gmail.com',
           age: 23,
           weight: 78,
           height: 1.7,

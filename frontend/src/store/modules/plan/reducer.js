@@ -2,7 +2,7 @@ import produce from 'immer';
 
 const INITIAL_STATE = {
   plan: null,
-  allPlans: null,
+  allPlans: [],
 };
 
 export default function plan(state = INITIAL_STATE, action) {
@@ -10,6 +10,11 @@ export default function plan(state = INITIAL_STATE, action) {
     switch (action.type) {
       case '@plan/CREATE_PLAN_SUCCESS': {
         draftState.plan = action.payload.plan;
+        break;
+      }
+
+      case '@plan/LOAD_ALL_PLANS_SUCCESS': {
+        draftState.allPlans = action.payload.allPlans;
         break;
       }
 

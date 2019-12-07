@@ -38,22 +38,22 @@ export function updateEnrollmentFailure() {
   };
 }
 
-export function handleEnrollmentRequest() {
+export function loadAllEnrollmentsRequest() {
   return {
-    type: '@enrollment/ALL_ENROLLMENTS_REQUEST',
+    type: '@enrollment/LOAD_ALL_ENROLLMENTS_REQUEST',
   };
 }
 
-export function handleEnrollmentSuccess(allEnrollments) {
+export function loadAllEnrollmentsSuccess(allEnrollments) {
   return {
-    type: '@enrollment/ALL_ENROLLMENTS_SUCCESS',
+    type: '@enrollment/LOAD_ALL_ENROLLMENTS_SUCCESS',
     payload: { allEnrollments },
   };
 }
 
-export function handleEnrollmentFailure() {
+export function loadAllEnrollmentsFailure() {
   return {
-    type: '@enrollment/ALL_ENROLLMENTS_FAILURE',
+    type: '@enrollment/LOAD_ALL_ENROLLMENTS_FAILURE',
   };
 }
 

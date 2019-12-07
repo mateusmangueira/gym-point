@@ -8,10 +8,10 @@ import history from '~/services/history';
 import {
   createEnrollmentSuccess,
   createEnrollmentFailure,
+  loadAllEnrollmentsSuccess,
+  loadAllEnrollmentsFailure,
   updateEnrollmentSuccess,
   updateEnrollmentFailure,
-  handleEnrollmentSuccess,
-  handleEnrollmentFailure,
   deleteEnrollmentSuccess,
   deleteEnrollmentFailure,
 } from './actions';
@@ -86,11 +86,11 @@ export function* deleteEnrollment({ payload }) {
   }
 }
 
-export function* handleEnrollments() {
+export function* loadEnrollments() {
   try {
     const response = yield api.get('enrollments');
     if (response) {
-      yield put(handleEnrollmentSuccess(response.data));
+      yield put(loadAllEnrollmentsSuccess(response.data));
     }
   } catch (error) {
     if (error.response.status === 400) {
@@ -100,13 +100,13 @@ export function* handleEnrollments() {
         'Houve algum erro ao carregar as matrículas, tente novamente mais tarde.'
       );
     }
-    yield put(handleEnrollmentFailure());
+    yield put(loadAllEnrollmentsFailure());
   }
 }
 
 export default all([
   takeLatest('@enrollment/CREATE_ENROLLMENT_REQUEST', createEnrollment),
+  takeLatest('@enrollment/LOAD_ALL_ENROLLMENTS_REQUEST', loadEnrollments),
   takeLatest('@enrollment/UPDATE_ENROLLMENT_REQUEST', updateEnrollment),
-  takeLatest('@enrollment/ALL_ENROLLMENTS_REQUEST', handleEnrollments),
   takeLatest('@enrollment/DELETE_ENROLLMENT_REQUEST', deleteEnrollment),
 ]);

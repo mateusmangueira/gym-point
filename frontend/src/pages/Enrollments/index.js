@@ -1,48 +1,29 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useSelector } from 'react';
 import { useDispatch } from 'react-redux';
 
 import { Link } from 'react-router-dom';
 import { MdCheckCircle } from 'react-icons/md';
 
-import { format, parseISO } from 'date-fns';
-import pt from 'date-fns/locale/pt';
-
-import api from '../../services/api';
 import history from '~/services/history';
 
 import { Container, Content, EnrollmentTable } from './styles';
 
 import ButtonRegister from '~/components/ButtonRegister';
 
-import { deleteEnrollmentRequest } from '../../store/modules/enrollment/actions';
+import {
+  loadAllEnrollmentsRequest,
+  deleteEnrollmentRequest,
+} from '../../store/modules/enrollment/actions';
 
 export default function Enrollments() {
   const dispatch = useDispatch();
-  const [enrollments, setEnrollments] = useState([]);
-
-  async function handleEnrollments() {
-    const response = await api.get('enrolls');
-
-    const data = response.data.map(enrollment => {
-      enrollment.startDateFormated = format(
-        parseISO(enrollment.start_date),
-        "dd 'de' MMMM 'de' yyyy",
-        { locale: pt }
-      );
-      enrollment.endDateFormated = format(
-        parseISO(enrollment.end_date),
-        "dd 'de' MMMM 'de' yyyy",
-        { locale: pt }
-      );
-      return enrollment;
-    });
-
-    setEnrollments(data);
-  }
+  const enrollments = useSelector(state => state.enrollment.allEnrollments);
 
   useEffect(() => {
-    handleEnrollments();
-  }, []);
+    dispatch(loadAllEnrollmentsRequest());
+  }, []); // eslint-disable-line
+
+  useEffect(() => { }, [enrollments]); // eslint-disable-line
 
   function handleDelete(id) {
     const result = window.confirm(

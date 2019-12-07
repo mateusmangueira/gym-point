@@ -12,6 +12,25 @@ export function createPlanSuccess(plan) {
   };
 }
 
+export function loadAllPlansRequest() {
+  return {
+    type: '@plan/LOAD_ALL_PLANS_REQUEST',
+  };
+}
+
+export function loadAllPlansSuccess(allPlans) {
+  return {
+    type: '@plan/LOAD_ALL_PLANS_SUCCESS',
+    payload: { allPlans },
+  };
+}
+
+export function loadAllPlansFailure() {
+  return {
+    type: '@plan/LOAD_ALL_PLANS_FAILURE',
+  };
+}
+
 export function createPlanFailure() {
   return {
     type: '@plan/CREATE_PLAN_FAILURE',

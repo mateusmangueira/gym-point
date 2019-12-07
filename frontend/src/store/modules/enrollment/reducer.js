@@ -2,7 +2,7 @@ import produce from 'immer';
 
 const INITIAL_STATE = {
   enrollment: null,
-  allEnrollments: null,
+  allEnrollments: [],
 };
 
 export default function enrollment(state = INITIAL_STATE, action) {
@@ -18,7 +18,7 @@ export default function enrollment(state = INITIAL_STATE, action) {
         break;
       }
 
-      case '@enrollment/ALL_ENROLLMENTS_SUCCESS': {
+      case '@registration/LOAD_ALL_ENROLLMENTS_SUCCESS': {
         draftState.allEnrollments = action.payload.allEnrollments;
         break;
       }

@@ -1,19 +1,23 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { toast } from 'react-toastify';
-import { addMonths, format, parseISO, startOfDay } from 'date-fns';
+import { useDispatch, useSelector } from 'react-redux';
+import { addMonths, parseISO, startOfDay } from 'date-fns';
 import * as Yup from 'yup';
+
+import PropTypes from 'prop-types';
+
+import DatePicker from 'react-datepicker';
+import pt from 'date-fns/locale/pt-BR';
 import { Container, Content, NewForm, DivForm } from './styles';
-
-import api from '~/services/api';
-import history from '~/services/history';
-
-import { formatPrice } from '~/util/format';
 
 import SelectInput from '~/components/SelectInput';
 import ButtonBack from '~/components/ButtonBack';
 import ButtonSave from '~/components/ButtonSave';
-import Input from '~/components/Input';
 import Select from '~/components/Select';
+
+import { updateEnrollmentRequest } from '../../../store/modules/enrollment/actions';
+
+import { loadAllPlansRequest } from '../../../store/modules/plan/actions';
+import { loadAllStudentsRequest } from '../../../store/modules/student/actions';
 
 const schema = Yup.object().shape({
   student_id: Yup.number()
@@ -25,79 +29,72 @@ const schema = Yup.object().shape({
   start_date: Yup.date().min(startOfDay(new Date()), 'Data muito antiga'),
 });
 
-export default function Register() {
-  const [students, setStudents] = useState([]);
-  const [plans, setPlans] = useState([]);
-  const [selectedPlan, setSelectedPlan] = useState(null);
-  const [startDate, setStartDate] = useState(new Date());
+export default function Edit({ match }) {
+  const dispatch = useDispatch();
+  const { id } = match.params;
+  const [start_date, setStartDate] = useState(new Date());
+  const [endDate, setEndDate] = useState(new Date());
+  const [selectedPlanId, setSelectedPlanId] = useState(null);
+  const [choosenPlan, setChoosenPlan] = useState(null);
+  const [finalPrice, setFinalPrice] = useState(0);
+
+  const plans = useSelector(state => state.plan.allPlans);
+  const students = useSelector(state => {
+    const titledStudents = state.student.allStudents.map(s => {
+      const newTitled = {
+        id: s.id,
+        title: s.name,
+      };
+      return newTitled;
+    });
+    return titledStudents;
+  });
+
+  const oneEnrollment = useSelector(state => {
+    return state.enrollment.allEnrollments.find(item => {
+      return item.id.toString() === id;
+    });
+  }) || { student_id: '1', plan_id: '1', start_date: '10/10/2020' };
 
   useEffect(() => {
-    async function handleStudents() {
-      const [studentsForm, plansForm] = await Promise.all([
-        await api.get('students'),
-        await api.get('plans'),
-      ]);
+    dispatch(loadAllPlansRequest());
+    dispatch(loadAllStudentsRequest());
+  }, []);  // eslint-disable-line
 
-      setStudents(
-        studentsForm.data.map(student => ({
-          value: student.id,
-          label: student.name,
-        }))
-      );
-
-      setPlans(plansForm.data);
+  useEffect(() => {
+    let currentPlan = {};
+    if (selectedPlanId) {
+      currentPlan = plans.find(item => item.id.toString() === selectedPlanId);
+    } else {
+      currentPlan = plans.find(item => item.id === oneEnrollment.plan_id);
     }
+    setChoosenPlan(currentPlan);
+  }, [selectedPlanId]);// eslint-disable-line
 
-    handleStudents();
-  }, []);
+  useEffect(() => {
+    setStartDate(parseISO(oneEnrollment.start_date));
+    setEndDate(parseISO(oneEnrollment.end_date));
+  }, []); // eslint-disable-line
 
-  async function loadOptions(inputValue) {
-    return students.filter(student =>
-      student.label.toLowerCase().includes(inputValue.toLowerCase())
-    );
+  useEffect(() => {
+    if (choosenPlan) {
+      setEndDate(addMonths(start_date, choosenPlan.duration));
+    }
+  }, [choosenPlan, start_date]); // eslint-disable-line
+
+  useEffect(() => {
+    if (choosenPlan) {
+      setFinalPrice(choosenPlan.duration * choosenPlan.price);
+    }
+  }, [choosenPlan]); // eslint-disable-line
+
+  function handleSubmit({ student_id, plan_id }) {
+    dispatch(updateEnrollmentRequest(student_id, plan_id, start_date, id));
   }
 
-  async function handleSubmit({ student_id, plan_id, start_date }) {
-    try {
-      await api.post('enrolls', {
-        student_id,
-        plan_id,
-        start_date,
-      });
-
-      toast.success('Matrícula atualizada com sucesso!');
-      history.push('/enrollments');
-    } catch (err) {
-      toast.error('Erro ao atualizar matrícula do aluno, verifique os dados');
-    }
-  }
-
-  const end_date = useMemo(() => {
-    if (!startDate || !selectedPlan) {
-      return null;
-    }
-
-    return format(
-      addMonths(startDate, selectedPlan.duration),
-      "dd'/'MM'/'yyyy"
-    );
-  }, [selectedPlan, startDate]);
-
-  const finalPrice = useMemo(() => {
-    if (!selectedPlan) {
-      return null;
-    }
-
-    return formatPrice(selectedPlan.price * selectedPlan.duration);
-  }, [selectedPlan]);
-
-  const initialData = useMemo(() => {
-    return {
-      start_date: format(new Date(), "yyyy'-'MM'-'dd"),
-      end_date,
-      finalPrice,
-    };
-  }, [end_date, finalPrice]);
+  const priceCurrency = useMemo(() => `R$ ${finalPrice.toFixed(2)}`, [
+    finalPrice,
+  ]);
 
   return (
     <Container>
@@ -113,46 +110,49 @@ export default function Register() {
 
         <NewForm
           id="enrollment-form"
-          initialData={initialData}
+          initialData={oneEnrollment}
           onSubmit={handleSubmit}
           schema={schema}
         >
           <span>ALUNO</span>
           <SelectInput
             name="student_id"
-            loadOptions={loadOptions}
-            defaultOptions={students}
+            options={students}
             placeholder="Buscar aluno"
           />
           <DivForm>
             <div>
               <span>PLANO</span>
               <Select
+                selected={selectedPlanId}
                 name="plan_id"
                 options={plans}
-                onChange={e =>
-                  setSelectedPlan(
-                    plans.find(p => p.id === Number(e.target.value))
-                  )
-                }
+                onChange={p => setSelectedPlanId(p.target.value)}
               />
             </div>
             <div>
               <span>DATA DE INÍCIO</span>
-              <Input
+              <DatePicker
                 name="start_date"
-                type="date"
-                placeholder="Escolha a nova data de início"
-                onChange={e => setStartDate(parseISO(e.target.value))}
+                selected={start_date}
+                onChange={date => setStartDate(date)}
+                locale={pt}
+                dateFormat="P"
               />
             </div>
             <div>
               <span>DATA DE TÉRMINO</span>
-              <Input name="end_date" disabled />
+              <DatePicker
+                name="enddate"
+                selected={endDate}
+                locale={pt}
+                dateFormat="P"
+                disabled
+              />
             </div>
             <div>
               <span>VALOR FINAL</span>
-              <Input name="finalPrice" disabled />
+              <input name="price" value={priceCurrency} disabled />
             </div>
           </DivForm>
         </NewForm>
@@ -160,3 +160,11 @@ export default function Register() {
     </Container>
   );
 }
+
+Edit.propTypes = {
+  match: PropTypes.shape({
+    params: PropTypes.shape({
+      id: PropTypes.string,
+    }),
+  }).isRequired,
+};

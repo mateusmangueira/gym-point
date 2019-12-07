@@ -1,12 +1,14 @@
 import { takeLatest, call, put, all } from 'redux-saga/effects';
 import { toast } from 'react-toastify';
 
-import api from '../../../services/api';
-import history from '../../../services/history';
+import api from '~/services/api';
+import history from '~/services/history';
 
 import {
   createStudentSuccess,
   createStudentFailure,
+  loadAllStudentsSuccess,
+  loadAllStudentsFailure,
   updateStudentSuccess,
   updateStudentFailure,
   deleteStudentSuccess,
@@ -25,6 +27,32 @@ export function* createStudent({ payload }) {
   } catch (error) {
     toast.error('Houve algum problema ao criar aluno');
     yield put(createStudentFailure());
+  }
+}
+
+export function* loadStudents({ payload }) {
+  try {
+    const { search } = payload;
+    let response = null;
+
+    if (search) {
+      response = yield api.get(`students?q=${payload.search}`);
+    } else {
+      response = yield api.get('students');
+    }
+
+    if (response) {
+      yield put(loadAllStudentsSuccess(response.data));
+    }
+  } catch (error) {
+    if (error.response.status === 400) {
+      toast.warn('Você não possui alunos');
+    } else {
+      toast.error(
+        'Houve erro no carregamento dos alunos, tente novamente mais tarde'
+      );
+    }
+    yield put(loadAllStudentsFailure());
   }
 }
 
@@ -73,6 +101,7 @@ export function* deleteStudent({ payload }) {
 
 export default all([
   takeLatest('@student/CREATE_STUDENT_REQUEST', createStudent),
+  takeLatest('@student/LOAD_ALL_STUDENTS_REQUEST', loadStudents),
   takeLatest('@student/UPDATE_STUDENT_REQUEST', updateStudent),
   takeLatest('@student/DELETE_STUDENT_REQUEST', deleteStudent),
 ]);

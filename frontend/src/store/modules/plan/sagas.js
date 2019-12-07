@@ -7,6 +7,8 @@ import history from '~/services/history';
 import {
   createPlanSuccess,
   createPlanFailure,
+  loadAllPlansSuccess,
+  loadAllPlansFailure,
   updatePlanSuccess,
   updatePlanFailure,
   deletePlanSuccess,
@@ -25,6 +27,24 @@ export function* createPlan({ payload }) {
   } catch (error) {
     toast.error('Houve um erro ao cadastrar o plano, verifique os dados');
     yield put(createPlanFailure());
+  }
+}
+
+export function* loadPlans() {
+  try {
+    const response = yield api.get('plans');
+    if (response) {
+      yield put(loadAllPlansSuccess(response.data));
+    }
+  } catch (error) {
+    if (error.response.status === 400) {
+      toast.warn('Você não possui planos criados');
+    } else {
+      toast.error(
+        'Houve um erro ao carregar os planos, tente novamente depois'
+      );
+    }
+    yield put(loadAllPlansFailure());
   }
 }
 

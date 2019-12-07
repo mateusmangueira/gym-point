@@ -12,6 +12,26 @@ export function createStudentSuccess(student) {
   };
 }
 
+export function loadAllStudentsRequest(search) {
+  return {
+    type: '@student/LOAD_ALL_STUDENTS_REQUEST',
+    payload: { search },
+  };
+}
+
+export function loadAllStudentsSuccess(allStudents) {
+  return {
+    type: '@student/LOAD_ALL_STUDENTS_SUCCESS',
+    payload: { allStudents },
+  };
+}
+
+export function loadAllStudentsFailure() {
+  return {
+    type: '@student/LOAD_ALL_STUDENTS_FAILURE',
+  };
+}
+
 export function createStudentFailure() {
   return {
     type: '@student/CREATE_STUDENT_FAILURE',

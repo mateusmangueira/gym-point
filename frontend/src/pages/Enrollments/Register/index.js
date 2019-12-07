@@ -1,19 +1,23 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { toast } from 'react-toastify';
-import { addMonths, format, parseISO, startOfDay } from 'date-fns';
+import { useDispatch, useSelector } from 'react-redux';
+
+import { addMonths } from 'date-fns';
 import * as Yup from 'yup';
+
+import DatePicker from 'react-datepicker';
+import pt from 'date-fns/locale/pt-BR';
+
 import { Container, Content, NewForm, DivForm } from './styles';
-
-import api from '~/services/api';
-import history from '~/services/history';
-
-import { formatPrice } from '~/util/format';
 
 import SelectInput from '~/components/SelectInput';
 import ButtonBack from '~/components/ButtonBack';
 import ButtonSave from '~/components/ButtonSave';
 import Input from '~/components/Input';
 import Select from '~/components/Select';
+
+import { createEnrollmentRequest } from '../../../store/modules/enrollment/actions';
+import { loadAllPlansRequest } from '../../../store/modules/plan/actions';
+import { loadAllStudentsRequest } from '../../../store/modules/student/actions';
 
 const schema = Yup.object().shape({
   student_id: Yup.number()
@@ -22,82 +26,64 @@ const schema = Yup.object().shape({
   plan_id: Yup.number()
     .typeError('Plano é obrigatório')
     .required(),
-  start_date: Yup.date().min(startOfDay(new Date()), 'Data muito antiga'),
 });
 
 export default function Register() {
-  const [students, setStudents] = useState([]);
-  const [plans, setPlans] = useState([]);
-  const [selectedPlan, setSelectedPlan] = useState(null);
-  const [startDate, setStartDate] = useState(new Date());
+  const dispatch = useDispatch();
+  const [start_date, setStartDate] = useState(new Date());
+  const plans = useSelector(state => state.plan.allPlans);
+  const [endDate, setEndDate] = useState(new Date());
+  const [selectedPlanId, setSelectedPlanId] = useState(null);
+  const [choosenPlan, setChoosenPlan] = useState(null);
+  const [finalPrice, setFinalPrice] = useState(0);
+
+  const students = useSelector(state => {
+    const titledStudents = state.student.allStudents.map(s => {
+      const newTitled = {
+        id: s.id,
+        title: s.name,
+      };
+      return newTitled;
+    });
+    return titledStudents;
+  });
 
   useEffect(() => {
-    async function handleStudents() {
-      const [studentsForm, plansForm] = await Promise.all([
-        await api.get('students'),
-        await api.get('plans'),
-      ]);
+    dispatch(loadAllPlansRequest());
+    dispatch(loadAllStudentsRequest());
+  }, []);  // eslint-disable-line
 
-      setStudents(
-        studentsForm.data.map(student => ({
-          value: student.id,
-          label: student.name,
-        }))
-      );
-
-      setPlans(plansForm.data);
-    }
-
-    handleStudents();
-  }, []);
-
-  async function loadOptions(inputValue) {
-    return students.filter(student =>
-      student.label.toLowerCase().includes(inputValue.toLowerCase())
-    );
+  function handleSubmit({ student_id, plan_id }) {
+    dispatch(createEnrollmentRequest(student_id, plan_id, start_date));
   }
 
-  async function handleSubmit({ student_id, plan_id, start_date }) {
-    try {
-      await api.post('enrolls', {
-        student_id,
-        plan_id,
-        start_date,
-      });
-
-      toast.success('Matrícula realizada com sucesso!');
-      history.push('/enrollments');
-    } catch (err) {
-      toast.error('Aluno já possui uma matrícula!');
+  useEffect(() => {
+    let currentPlan = {};
+    if (selectedPlanId) {
+      currentPlan = plans.find(item => item.id.toString() === selectedPlanId);
     }
-  }
+    setChoosenPlan(currentPlan);
+  }, [selectedPlanId]);// eslint-disable-line
 
-  const end_date = useMemo(() => {
-    if (!startDate || !selectedPlan) {
-      return null;
+  // Atualiza campo de data de término
+  useEffect(() => {
+    // Se existe um plano carregado no selector
+    if (selectedPlanId) {
+      setEndDate(addMonths(start_date, choosenPlan.duration));
     }
+  }, [choosenPlan, start_date]); // eslint-disable-line
 
-    return format(
-      addMonths(startDate, selectedPlan.duration),
-      "dd'/'MM'/'yyyy"
-    );
-  }, [selectedPlan, startDate]);
-
-  const finalPrice = useMemo(() => {
-    if (!selectedPlan) {
-      return null;
+  // Atualiza valor final
+  useEffect(() => {
+    if (selectedPlanId) {
+      const { price, duration } = choosenPlan;
+      setFinalPrice(price * duration);
     }
+  }, [choosenPlan]); // eslint-disable-line
 
-    return formatPrice(selectedPlan.price * selectedPlan.duration);
-  }, [selectedPlan]);
-
-  const initialData = useMemo(() => {
-    return {
-      start_date: format(new Date(), "yyyy'-'MM'-'dd"),
-      end_date,
-      finalPrice,
-    };
-  }, [end_date, finalPrice]);
+  const priceCurrency = useMemo(() => `R$ ${finalPrice.toFixed(2)}`, [
+    finalPrice,
+  ]);
 
   return (
     <Container>
@@ -111,48 +97,46 @@ export default function Register() {
           </div>
         </header>
 
-        <NewForm
-          id="enrollment-form"
-          initialData={initialData}
-          onSubmit={handleSubmit}
-          schema={schema}
-        >
+        <NewForm id="enrollment-form" onSubmit={handleSubmit} schema={schema}>
           <span>ALUNO</span>
           <SelectInput
             name="student_id"
-            loadOptions={loadOptions}
-            defaultOptions={students}
-            placeholder="Buscar aluno"
+            options={students}
+            placeholder="Selecione um aluno"
           />
           <DivForm>
             <div>
               <span>PLANO</span>
               <Select
+                selected={selectedPlanId}
+                onChange={p => setSelectedPlanId(p.target.value)}
                 name="plan_id"
                 options={plans}
-                onChange={e =>
-                  setSelectedPlan(
-                    plans.find(p => p.id === Number(e.target.value))
-                  )
-                }
+                placeholder="Selecione um plano"
               />
             </div>
             <div>
               <span>DATA DE INÍCIO</span>
-              <Input
-                name="start_date"
-                type="date"
-                placeholder="Escolha a data"
-                onChange={e => setStartDate(parseISO(e.target.value))}
+              <DatePicker
+                selected={start_date}
+                onChange={date => setStartDate(date)}
+                locale={pt}
+                dateFormat="P"
               />
             </div>
             <div>
               <span>DATA DE TÉRMINO</span>
-              <Input name="end_date" disabled />
+              <DatePicker
+                name="endDate"
+                selected={endDate}
+                locale={pt}
+                dateFormat="P"
+                disabled
+              />
             </div>
             <div>
               <span>VALOR FINAL</span>
-              <Input name="finalPrice" disabled />
+              <Input name="finalPrice" value={priceCurrency} disabled />
             </div>
           </DivForm>
         </NewForm>

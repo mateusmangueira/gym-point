@@ -1,10 +1,11 @@
 import * as Yup from 'yup';
+import { format } from 'date-fns-tz';
+import pt from 'date-fns/locale/pt-BR';
 
 import Student from '../models/Student';
 import HelpOrder from '../models/HelpOrder';
 
-import StoreHelpOrder from '../jobs/StoreHelpOrder';
-import Queue from '../../lib/Queue';
+import Mail from '../../lib/Mail';
 
 class HelpOrderController {
   async index(req, res) {
@@ -34,44 +35,85 @@ class HelpOrderController {
     return res.json(helpOrder);
   }
 
-  async store(req, res) {
+  async storeQuestion(req, res) {
     const schema = Yup.object().shape({
-      answer: Yup.string().required(),
+      question: Yup.string().required(),
     });
 
     if (!(await schema.isValid(req.body))) {
       return res
         .status(400)
-        .json({ error: 'Help Order Admin validation failed' });
+        .json({ error: 'Store question validation failed.' });
     }
 
+    const { question } = req.body;
     const { id } = req.params;
-    const { answer } = req.body;
 
-    const helpOrder = await HelpOrder.findByPk(id, {
-      include: [
-        {
-          model: Student,
-          as: 'student',
-          attributes: ['id', 'name', 'email'],
-        },
-      ],
+    const checkStudent = await Student.findByPk(id);
+    if (!checkStudent) {
+      return res
+        .status(400)
+        .json({ error: 'Student was not found to check-in.' });
+    }
+
+    const helporder = await HelpOrder.create({
+      question,
+      student_id: id,
     });
 
-    if (helpOrder.answer !== null) {
-      return res
-        .status(401)
-        .json({ error: 'You can answer a help order only once' });
+    return res.json(helporder);
+  }
+
+  async storeAnswer(req, res) {
+    const schema = Yup.object().shape({
+      answer: Yup.string().required(),
+    });
+
+    if (!(await schema.isValid(req.body))) {
+      return res.status(400).json({ error: 'Store answer validation failed.' });
     }
 
-    await helpOrder.update({ answer, answer_at: new Date() });
+    const { answer } = req.body;
+    const { id } = req.params;
+
+    const helpOrder = await HelpOrder.findByPk(id);
+    if (!helpOrder) {
+      return res.status(400).json({ error: 'Help Order was not found.' });
+    }
+
+    const response = await helpOrder.update({
+      answer,
+      answer_at: new Date(),
+    });
+
     await helpOrder.save();
 
-    await Queue.add(StoreHelpOrder.key, {
-      helpOrder,
+    const student = await Student.findByPk(helpOrder.student_id);
+
+    await Mail.sendMail({
+      to: `${student.name} <${student.email}>`,
+      subject: 'Resposta a seu pedido de auxílio.',
+      template: 'helporderanswer',
+      context: {
+        provider: student.name,
+        question: helpOrder.question,
+        answer: helpOrder.answer,
+        answer_at: format(
+          helpOrder.answer_at,
+          "'dia' dd 'de' MMMM', às' H:mm'h'",
+          { locale: pt }
+        ),
+      },
     });
 
-    return res.json(helpOrder);
+    return res.json(response.data);
+  }
+
+  async questionsStudent(req, res) {
+    const helps = await HelpOrder.findAll({
+      where: { student_id: req.params.id },
+    });
+    return res.json(helps);
   }
 }
 

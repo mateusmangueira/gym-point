@@ -1,6 +1,8 @@
 import * as Yup from 'yup';
+import { isBefore, subDays } from 'date-fns';
 
 import Student from '../models/Student';
+import Checkin from '../models/Checkin';
 
 class StudentController {
   async index(req, res) {
@@ -12,6 +14,42 @@ class StudentController {
     });
 
     return res.json(students);
+  }
+
+  async signIn(req, res) {
+    const { name } = req.body;
+
+    if (name) {
+      const studentExists = await Student.findOne({ where: { name } });
+
+      if (studentExists) {
+        return res.json(studentExists);
+      }
+    }
+
+    return res.status(400).json({ error: 'Student was not found.' });
+  }
+
+  async checkins(req, res) {
+    const { id } = req.params;
+
+    const student = await Student.findByPk(id);
+
+    const allCheckins = await Checkin.findAll({
+      where: { student_id: student.id },
+    });
+
+    const todayMinusSeven = subDays(new Date(), 7);
+    let numberCheckins = 0;
+
+    // eslint-disable-next-line no-restricted-syntax
+    for (const key in allCheckins) {
+      if (isBefore(todayMinusSeven, allCheckins[key].createdAt)) {
+        numberCheckins++;
+      }
+    }
+
+    return res.json({ allCheckins, numberCheckins });
   }
 
   async show(req, res) {

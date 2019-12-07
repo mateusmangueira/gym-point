@@ -17,7 +17,8 @@ import {
 
 export default function Enrollments() {
   const dispatch = useDispatch();
-  const enrollments = useSelector(state => state.enrollment.allEnrollments);
+  const enrollments =
+    useSelector(state => state.enrollment.allEnrollments) || [];
 
   useEffect(() => {
     dispatch(loadAllEnrollmentsRequest());

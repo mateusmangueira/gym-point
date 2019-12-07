@@ -7,29 +7,29 @@ import { Modal } from '~/components/Modal';
 import { Container, Content, ListHelpOrders, Nav } from './styles';
 
 import {
-  helpOrdersRequest,
-  oneHelpOrderRequest,
+  loadAllHelpOrdersRequest,
+  loadOneHelpOrderRequest,
   answerHelpOrderRequest,
-} from '../../store/modules/help_order/actions';
+} from '../../store/modules/helpOrder/actions';
 
-export default function HelpOrders() {
+export default function HelpOrder() {
   const dispatch = useDispatch();
-  const helpOrders = useSelector(state => state.help_order.allHelpOrders) || [];
-  const [help] = useSelector(state => state.help_order.helpOrder) || [];
+  const helps = useSelector(state => state.helpOrder.allHelpOrders) || [];
   const [showModal, setShowModal] = useState(false);
+  const [order] = useSelector(state => state.helpOrder.helpOrder) || [];
   const [question, setQuestion] = useState('');
 
   useEffect(() => {
-    dispatch(helpOrdersRequest());
+    dispatch(loadAllHelpOrdersRequest());
   }, []); // eslint-disable-line
 
   function handleOpenModal(id) {
-    dispatch(oneHelpOrderRequest(id));
+    dispatch(loadOneHelpOrderRequest(id));
     setShowModal(!showModal);
-    if (help) {
-      setQuestion(help.question);
+    if (order) {
+      setQuestion(order.question);
     } else {
-      toast.error('Problemas com os dados');
+      toast.error('Problemas com os pedidos de auxílio');
     }
   }
 
@@ -38,7 +38,7 @@ export default function HelpOrders() {
   }
 
   function handleAnswer({ answer }) {
-    dispatch(answerHelpOrderRequest(answer, help.id));
+    dispatch(answerHelpOrderRequest(answer, order.id));
   }
 
   return (
@@ -76,7 +76,7 @@ export default function HelpOrders() {
               </tr>
             </thead>
             <tbody>
-              {helpOrders.map(help => (
+              {helps.map(help => (
                 <tr key={help.id}>
                   <td className="align-left">{help.student.name}</td>
                   <td className="answer">

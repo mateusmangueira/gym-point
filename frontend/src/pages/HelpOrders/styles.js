@@ -93,7 +93,7 @@ export const ListHelpOrders = styled.div`
     border-collapse: collapse;
     tr,
     th {
-      color: ${lighten(0.2, '#333')};
+      font-weight: bold;
       text-align: center;
     }
     .align-left {

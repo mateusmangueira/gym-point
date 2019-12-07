@@ -88,5 +88,6 @@ export function* deletePlan({ payload }) {
 export default all([
   takeLatest('@plan/CREATE_PLAN_REQUEST', createPlan),
   takeLatest('@plan/UPDATE_PLAN_REQUEST', updatePlan),
+  takeLatest('@plan/LOAD_ALL_PLANS_REQUEST', loadPlans),
   takeLatest('@plan/DELETE_PLAN_REQUEST', deletePlan),
 ]);

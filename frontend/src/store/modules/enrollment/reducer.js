@@ -18,7 +18,7 @@ export default function enrollment(state = INITIAL_STATE, action) {
         break;
       }
 
-      case '@registration/LOAD_ALL_ENROLLMENTS_SUCCESS': {
+      case '@enrollment/LOAD_ALL_ENROLLMENTS_SUCCESS': {
         draftState.allEnrollments = action.payload.allEnrollments;
         break;
       }

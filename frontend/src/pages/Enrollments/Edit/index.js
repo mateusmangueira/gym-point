@@ -64,7 +64,7 @@ export default function Edit({ match }) {
   useEffect(() => {
     let currentPlan = {};
     if (selectedPlanId) {
-      currentPlan = plans.find(item => item.id.toString() === selectedPlanId);
+      currentPlan = plans.find(item => Number(item.id) === selectedPlanId);
     } else {
       currentPlan = plans.find(item => item.id === oneEnrollment.plan_id);
     }

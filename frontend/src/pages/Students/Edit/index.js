@@ -1,5 +1,5 @@
 import React from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import * as Yup from 'yup';
 
@@ -24,6 +24,12 @@ export default function Edit({ match }) {
   const dispatch = useDispatch();
   const { id } = match.params;
 
+  const student = useSelector(state => {
+    return state.student.allStudents.find(item => {
+      return item.id.toString() === id;
+    });
+  }) || { name: 'Nome', email: 'Email', idade: 1, peso: 1, altura: 1 };
+
   async function handleEdit({ name, email, age, weight, height }) {
     dispatch(updateStudentRequest(name, email, age, weight, height, id));
   }
@@ -39,7 +45,12 @@ export default function Edit({ match }) {
         </div>
       </header>
 
-      <Form schema={schema} onSubmit={handleEdit} id="student-form-edit">
+      <Form
+        schema={schema}
+        initialData={student}
+        onSubmit={handleEdit}
+        id="student-form-edit"
+      >
         <span>NOME COMPLETO</span>
         <Input name="name" type="text" placeholder="Novo nome completo" />
         <span>ENDEREÇO DE E-MAIL</span>

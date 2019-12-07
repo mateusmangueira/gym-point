@@ -1,5 +1,5 @@
-import React, { useEffect, useState, useMemo } from 'react';
-import { useDispatch } from 'react-redux';
+import React, { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 
 import { Link } from 'react-router-dom';
 import { MdSearch } from 'react-icons/md';
@@ -7,51 +7,35 @@ import { MdSearch } from 'react-icons/md';
 import Input from '~/components/Input';
 import ButtonRegister from '~/components/ButtonRegister';
 
+import history from '../../services/history';
+
 import { Container, Search, ListStudents } from './styles';
 
-import api from '~/services/api';
-import history from '~/services/history';
-
-import { deleteStudentRequest } from '../../store/modules/student/actions';
+import {
+  deleteStudentRequest,
+  loadAllStudentsRequest,
+} from '../../store/modules/student/actions';
 
 export default function Students() {
   const dispatch = useDispatch();
-  const [students, setStudents] = useState([]);
+  const students = useSelector(state => state.student.allStudents);
   const [search, setSearch] = useState('');
 
   useEffect(() => {
-    async function handleStudents() {
-      const response = await api.get('students');
+    dispatch(loadAllStudentsRequest());
+  }, []); // eslint-disable-line
 
-      setStudents(response.data);
+  useEffect(() => {
+    if (search !== null) {
+      dispatch(loadAllStudentsRequest(search, null));
     }
-
-    handleStudents();
-  }, []);
+  }, [search]); // eslint-disable-line
 
   async function handleDelete(id) {
     const result = window.confirm('Tem certeza que deseja apagar esse aluno?');
     if (result) {
       dispatch(deleteStudentRequest(id));
     }
-  }
-
-  useMemo(() => {
-    async function getStudent() {
-      const response = await api.get('students', {
-        params: {
-          q: search,
-        },
-      });
-
-      setStudents(response.data);
-    }
-
-    getStudent();
-  }, [search]);
-
-  async function handleStudentSearch(e) {
-    setSearch(e.target.value);
   }
 
   return (
@@ -69,7 +53,7 @@ export default function Students() {
             <MdSearch color="#999" size={16} />
             <Input
               checked={search}
-              onChange={handleStudentSearch}
+              onChange={e => setSearch(e.target.value)}
               name="search"
               type="text"
               placeholder="Buscar aluno"

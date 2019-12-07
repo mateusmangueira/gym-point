@@ -41,6 +41,22 @@ export function* createEnrollment({ payload }) {
   }
 }
 
+export function* loadEnrollments() {
+  try {
+    const response = yield api.get('help-orders');
+    if (response) {
+      yield put(loadAllEnrollmentsSuccess(response.data));
+    }
+  } catch (error) {
+    if (error.response.status === 400) {
+      toast.warn('Não existe matrículas cadastradas');
+    } else {
+      toast.error('Houve um erro ao carregar as matrículas, tente novamente');
+    }
+    yield put(loadAllEnrollmentsFailure());
+  }
+}
+
 export function* updateEnrollment({ payload }) {
   try {
     const { student_id, plan_id, start_date, id } = payload;
@@ -83,24 +99,6 @@ export function* deleteEnrollment({ payload }) {
     history.push('/enrollments');
   } catch (error) {
     yield put(deleteEnrollmentFailure());
-  }
-}
-
-export function* loadEnrollments() {
-  try {
-    const response = yield api.get('enrollments');
-    if (response) {
-      yield put(loadAllEnrollmentsSuccess(response.data));
-    }
-  } catch (error) {
-    if (error.response.status === 400) {
-      toast.warn('Você possui nenhuma matrícula');
-    } else {
-      toast.error(
-        'Houve algum erro ao carregar as matrículas, tente novamente mais tarde.'
-      );
-    }
-    yield put(loadAllEnrollmentsFailure());
   }
 }
 

@@ -1,39 +1,25 @@
-import React, { useEffect, useState } from 'react';
-import { useDispatch } from 'react-redux';
+import React, { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 
-import api from '../../services/api';
-import history from '~/services/history';
+import history from '../../services/history';
 import { formatPrice } from '../../util/format';
 
 import ButtonRegister from '~/components/ButtonRegister';
 import { Container, Content, PlanTable } from './styles';
 
-import { deletePlanRequest } from '~/store/modules/plan/actions';
+import {
+  deletePlanRequest,
+  loadAllPlansRequest,
+} from '../../store/modules/plan/actions';
 
 export default function Plans() {
   const dispatch = useDispatch();
-  const [plans, setPlans] = useState([]);
-
-  async function handlePlans() {
-    const response = await api.get('plans');
-
-    const data = response.data.map(plan => {
-      plan.priceFormated = formatPrice(plan.price);
-      if (plan.duration === 1) {
-        plan.durationFormated = '1 mês';
-      } else {
-        plan.durationFormated = `${plan.duration} meses`;
-      }
-      return plan;
-    });
-
-    setPlans(data);
-  }
+  const plans = useSelector(state => state.plan.allPlans);
 
   useEffect(() => {
-    handlePlans();
-  }, []);
+    dispatch(loadAllPlansRequest());
+  }, []); // eslint-disable-line
 
   function handleDelete(id) {
     const result = window.confirm('Tem certeza que deseja deletar esse plano?');
@@ -52,6 +38,7 @@ export default function Plans() {
       <Content>
         <header>
           <h1>Gerenciando planos</h1>
+
           <ButtonRegister
             type="button"
             onClick={() => {

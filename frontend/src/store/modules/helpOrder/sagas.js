@@ -38,7 +38,7 @@ export function* loadHelpOrders() {
       toast.warn('Não existem pedidos de auxílio criados');
     } else {
       toast.error(
-        `Erro na requisição de pedidos de auxílio: ${error.response.data.error}`
+        'Houve um erro ao carregar os pedidos de auxílio, tente novamente'
       );
     }
     yield put(loadAllHelpOrdersFailure());
@@ -57,7 +57,7 @@ export function* loadOneHelpOrder({ payload }) {
       toast.warn('Não existe pedido de auxílio');
     } else {
       toast.error(
-        `Erro na requisição do pedido de auxílio: ${error.response.data.error}`
+        'Houve um erro ao carregar o pedidos de auxílio selecionado, tente novamente'
       );
     }
     yield put(loadOneHelpOrderFailure());

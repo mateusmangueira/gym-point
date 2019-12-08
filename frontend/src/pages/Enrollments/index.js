@@ -1,8 +1,11 @@
-import React, { useEffect, useSelector } from 'react';
-import { useDispatch } from 'react-redux';
+import React, { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 
 import { Link } from 'react-router-dom';
 import { MdCheckCircle } from 'react-icons/md';
+
+import { parseISO, format } from 'date-fns';
+import pt from 'date-fns/locale/pt-BR';
 
 import history from '~/services/history';
 
@@ -35,6 +38,13 @@ export default function Enrollments() {
     }
   }
 
+  function formatDate(date) {
+    const formattedDate = format(parseISO(date), "d 'de' MMMM 'de' yyyy", {
+      locale: pt,
+    });
+    return formattedDate;
+  }
+
   return (
     <Container>
       <Content>
@@ -61,8 +71,8 @@ export default function Enrollments() {
               <tr key={enrollment.id}>
                 <td>{enrollment.student.name}</td>
                 <td>{enrollment.plan.title}</td>
-                <td>{enrollment.startDateFormated}</td>
-                <td>{enrollment.endDateFormated}</td>
+                <td>{formatDate(enrollment.start_date)}</td>
+                <td>{formatDate(enrollment.end_date)}</td>
                 <td>
                   {enrollment.active ? (
                     <MdCheckCircle color="#42cb59" size={20} />

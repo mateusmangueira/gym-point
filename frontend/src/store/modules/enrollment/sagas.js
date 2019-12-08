@@ -43,7 +43,7 @@ export function* createEnrollment({ payload }) {
 
 export function* loadEnrollments() {
   try {
-    const response = yield api.get('help-orders');
+    const response = yield api.get('/enrolls');
     if (response) {
       yield put(loadAllEnrollmentsSuccess(response.data));
     }

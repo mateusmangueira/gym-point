@@ -12,10 +12,9 @@ export function createStudentSuccess(student) {
   };
 }
 
-export function loadAllStudentsRequest(search) {
+export function loadAllStudentsRequest() {
   return {
     type: '@student/LOAD_ALL_STUDENTS_REQUEST',
-    payload: { search },
   };
 }
 

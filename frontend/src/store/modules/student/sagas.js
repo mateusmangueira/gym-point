@@ -27,30 +27,22 @@ export function* createStudent({ payload }) {
   } catch (error) {
     toast.error('Houve algum problema ao criar aluno');
     yield put(createStudentFailure());
+    history.push('/students');
   }
 }
 
-export function* loadStudents({ payload }) {
+export function* loadStudents() {
   try {
-    const { search } = payload;
-    let response = null;
-
-    if (search) {
-      response = yield api.get(`students?q=${payload.search}`);
-    } else {
-      response = yield api.get('students');
-    }
+    const response = yield api.get('students');
 
     if (response) {
       yield put(loadAllStudentsSuccess(response.data));
     }
   } catch (error) {
     if (error.response.status === 400) {
-      toast.warn('Você não possui alunos');
+      toast.warn('Você não possui alunos criados');
     } else {
-      toast.error(
-        'Houve erro no carregamento dos alunos, tente novamente mais tarde'
-      );
+      toast.error('Houve um erro ao carregar os alunos, tente novamente');
     }
     yield put(loadAllStudentsFailure());
   }

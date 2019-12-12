@@ -41,8 +41,6 @@ export function* loadStudents() {
   } catch (error) {
     if (error.response.status === 400) {
       toast.warn('Você não possui alunos criados');
-    } else {
-      toast.error('Houve um erro ao carregar os alunos, tente novamente');
     }
     yield put(loadAllStudentsFailure());
   }

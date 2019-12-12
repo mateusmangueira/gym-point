@@ -18,9 +18,8 @@ export function* answerOrder({ payload }) {
 
     const response = yield call(api.post, `/help-orders/${id}/answer`, payload);
 
-    toast.success('Resposta criada com sucesso.');
-
     yield put(answerHelpOrderSuccess(response.data));
+    toast.success('Resposta criada com sucesso.');
   } catch (error) {
     toast.error('Houve um erro ao criar resposta, tente novamente');
     yield put(answerHelpOrderFailure());

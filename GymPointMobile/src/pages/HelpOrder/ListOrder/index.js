@@ -26,7 +26,7 @@ import {
 
 import { BarImage, BarButton, BarText } from '~/globalStyles';
 
-import headerlogo from '~/assets/halter.png';
+import headerlogo from '~/assets/headerLogo.png';
 
 export default function ListOrder({ navigation }) {
   const dispatch = useDispatch();

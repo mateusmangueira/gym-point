@@ -23,7 +23,7 @@ import {
   IconLeft,
 } from '~/globalStyles';
 
-import headerlogo from '~/assets/halter.png';
+import headerlogo from '~/assets/headerLogo.png';
 
 export default function HelpOrderResponse({ navigation }) {
   const [question, setQuestion] = useState({});

@@ -42,7 +42,7 @@ export default createAppContainer(
             ),
           },
         },
-        NewHelp: {
+        Help: {
           screen: createStackNavigator(
             {
               ListOrder,

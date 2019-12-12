@@ -25,9 +25,9 @@ import {
 
 import { BarImage, BarButton, BarText } from '~/globalStyles';
 
-import headerlogo from '~/assets/halter.png';
+import headerlogo from '~/assets/headerLogo.png';
 
-export default function Checkin() {
+export default function CheckIn() {
   const dispatch = useDispatch();
   const loading = useSelector((state) => state.checkIn.loading);
   const numberCheckins = useSelector((state) => state.checkIn.numberCheckins);
@@ -97,7 +97,7 @@ export default function Checkin() {
   );
 }
 
-Checkin.navigationOptions = ({ navigation }) => ({
+CheckIn.navigationOptions = ({ navigation }) => ({
   header: (
     <BarButton onPress={() => navigation.navigate('ListOrder')}>
       <BarImage source={headerlogo} />

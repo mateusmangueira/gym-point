@@ -22,14 +22,14 @@ export function* answerOrder({ payload }) {
 
     yield put(answerHelpOrderSuccess(response.data));
   } catch (error) {
-    toast.error('Houve um erro ao criar resposta, tente novamente mais tarde.');
+    toast.error('Houve um erro ao criar resposta, tente novamente');
     yield put(answerHelpOrderFailure());
   }
 }
 
 export function* loadHelpOrders() {
   try {
-    const response = yield api.get('help-orders');
+    const response = yield api.get('/help-orders');
     if (response) {
       yield put(loadAllHelpOrdersSuccess(response.data));
     }
@@ -48,7 +48,7 @@ export function* loadHelpOrders() {
 export function* loadOneHelpOrder({ payload }) {
   try {
     const { id } = payload;
-    const response = yield api.get(`help-orders/${id}`);
+    const response = yield api.get(`/help-orders/${id}`);
     if (response) {
       yield put(loadOneHelpOrderSuccess(response.data));
     }
@@ -67,5 +67,5 @@ export function* loadOneHelpOrder({ payload }) {
 export default all([
   takeLatest('@helpOrder/ANSWER_HELP_ORDER_REQUEST', answerOrder),
   takeLatest('@helpOrder/LOAD_ALL_HELP_ORDERS_REQUEST', loadHelpOrders),
-  takeLatest('@helpOrder/ONE_HELP_ORDER_REQUEST', loadOneHelpOrder),
+  takeLatest('@helpOrder/LOAD_ONE_HELP_ORDER_REQUEST', loadOneHelpOrder),
 ]);

@@ -65,7 +65,7 @@ export function loadAllNotAnsweredHelpOrdersRequest() {
 
 export function loadAllNotAnsweredHelpOrdersSuccess(allhelpOrders) {
   return {
-    type: '@helpPrder/LOAD_ALL_NOT_ANSWERED_HELPORDERS_SUCCESS',
+    type: '@helpOrder/LOAD_ALL_NOT_ANSWERED_HELP_ORDERS_SUCCESS',
     payload: { allhelpOrders },
   };
 }

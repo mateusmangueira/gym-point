@@ -66,18 +66,7 @@ export const Nav = styled.div`
   }
 `;
 
-export const BoxIcon = styled.div`
-  font-size: 12px;
-  margin-left: 8px;
-  border: 1px solid ${lighten(0.7, '#333')};
-  border-right: 0;
-  border-top-left-radius: 3px;
-  border-bottom-left-radius: 3px;
-  padding: 0px 5px;
-  background: #fff;
-`;
-
-export const ListHelpOrders = styled.div`
+export const Items = styled.div`
   padding: 20px 40px;
   background-color: #fff;
   border-radius: 5px;
@@ -93,7 +82,7 @@ export const ListHelpOrders = styled.div`
     border-collapse: collapse;
     tr,
     th {
-      font-weight: bold;
+      color: ${lighten(0.2, '#333')};
       text-align: center;
     }
     .align-left {

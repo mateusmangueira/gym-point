@@ -8,7 +8,7 @@ import HelpOrders from '~/pages/HelpOrders';
 
 import Enrollments from '~/pages/Enrollments';
 import EnrollmentsRegister from '~/pages/Enrollments/Register';
-import EnrollmentsEdit from '../pages/Enrollments/Edit';
+import EnrollmentsEdit from '~/pages/Enrollments/Edit';
 
 import Plans from '~/pages/Plans';
 import PlansEdit from '~/pages/Plans/Edit';

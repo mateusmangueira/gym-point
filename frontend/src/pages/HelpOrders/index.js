@@ -2,43 +2,53 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 import { Input, Form } from '@rocketseat/unform';
+import { Container, Content, Items, Nav } from './styles';
 import { Modal } from '~/components/Modal';
 
-import { Container, Content, ListHelpOrders, Nav } from './styles';
+import api from '../../services/api';
 
 import {
-  loadAllHelpOrdersRequest,
-  loadOneHelpOrderRequest,
   answerHelpOrderRequest,
-} from '../../store/modules/helpOrder/actions';
+  loadOneHelpOrderRequest,
+} from '~/store/modules/helpOrder/actions';
 
-export default function HelpOrder() {
+export default function HelpOrders() {
   const dispatch = useDispatch();
-  const helps = useSelector(state => state.helpOrder.allHelpOrders) || [];
+  const [helpOrders, setHelpOrders] = useState([]);
   const [showModal, setShowModal] = useState(false);
-  const [order] = useSelector(state => state.helpOrder.helpOrder) || [];
+  const [aHelp] = useSelector(state => state.helpOrder.helpOrder) || [];
   const [question, setQuestion] = useState('');
 
   useEffect(() => {
-    dispatch(loadAllHelpOrdersRequest());
-  }, []); // eslint-disable-line
+    async function loadHelpOrders() {
+      try {
+        const response = await api.get('/help-orders');
+
+        setHelpOrders(response.data);
+      } catch (error) {
+        toast.error('Não foi possível carregar os pedidos de auxílio.');
+      }
+    }
+
+    loadHelpOrders();
+  }, []);
 
   function handleOpenModal(id) {
     dispatch(loadOneHelpOrderRequest(id));
     setShowModal(!showModal);
-    if (order) {
-      setQuestion(order.question);
+    if (aHelp) {
+      setQuestion(aHelp.question);
     } else {
-      toast.error('Problemas com os pedidos de auxílio');
+      toast.warn('Os pedidos estão sendo carregados');
     }
   }
 
-  function hideModal() {
+  function handleModal() {
     setShowModal(!showModal);
   }
 
   function handleAnswer({ answer }) {
-    dispatch(answerHelpOrderRequest(answer, order.id));
+    dispatch(answerHelpOrderRequest(answer, aHelp.id));
   }
 
   return (
@@ -48,7 +58,7 @@ export default function HelpOrder() {
           <strong>Pedidos de auxílio</strong>
         </Nav>
 
-        <Modal show={showModal} handleClose={hideModal}>
+        <Modal show={showModal} handleClose={handleModal}>
           <Form onSubmit={handleAnswer}>
             <p>Pergunta do Aluno</p>
             <p className="question">{question}</p>
@@ -60,13 +70,13 @@ export default function HelpOrder() {
               autoComplete="off"
               multiline
             />
-            <button type="submit" onClick={hideModal}>
+            <button type="submit" onClick={handleModal}>
               Responder Aluno
             </button>
           </Form>
         </Modal>
 
-        <ListHelpOrders>
+        <Items>
           <table>
             <thead>
               <tr>
@@ -76,7 +86,7 @@ export default function HelpOrder() {
               </tr>
             </thead>
             <tbody>
-              {helps.map(help => (
+              {helpOrders.map(help => (
                 <tr key={help.id}>
                   <td className="align-left">{help.student.name}</td>
                   <td className="answer">
@@ -92,7 +102,7 @@ export default function HelpOrder() {
               ))}
             </tbody>
           </table>
-        </ListHelpOrders>
+        </Items>
       </Content>
     </Container>
   );

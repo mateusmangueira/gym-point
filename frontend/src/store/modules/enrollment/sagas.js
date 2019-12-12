@@ -18,7 +18,7 @@ import {
 
 export function* createEnrollment({ payload }) {
   try {
-    const { start_date } = payload;
+    const { student_id, plan_id, start_date } = payload;
 
     if (isBefore(start_date, setMinutes(setHours(new Date(), 0), 0))) {
       toast.error('Data de matrícula precisa ser maior que a atual');
@@ -26,6 +26,8 @@ export function* createEnrollment({ payload }) {
     }
 
     const response = yield call(api.post, '/enrolls', {
+      student_id,
+      plan_id,
       start_date,
       active: true,
     });
@@ -34,7 +36,7 @@ export function* createEnrollment({ payload }) {
 
     yield put(createEnrollmentSuccess(response.data));
 
-    history.push('/enrollments');
+    history.push('/');
   } catch (error) {
     toast.error('Houve um erro na matrícula, verifique os dados');
     yield put(createEnrollmentFailure());

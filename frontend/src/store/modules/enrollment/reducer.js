@@ -2,7 +2,7 @@ import produce from 'immer';
 
 const INITIAL_STATE = {
   enrollment: null,
-  allEnrollments: [],
+  allEnrollments: null,
 };
 
 export default function enrollment(state = INITIAL_STATE, action) {

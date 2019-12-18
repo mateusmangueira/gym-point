@@ -4,14 +4,19 @@ import { useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import * as Yup from 'yup';
 
-import ButtonBack from '~/components/ButtonBack';
-import ButtonSave from '~/components/ButtonSave';
-import Form from '~/components/DefaultForm';
-import Input from '~/components/Input';
+import { Link } from 'react-router-dom';
+import { Form, Input } from '@rocketseat/unform';
+import { MdChevronLeft, MdCheck } from 'react-icons/md';
 
-import { updatePlanRequest } from '../../../store/modules/plan/actions';
+import { updatePlanRequest } from '~/store/modules/plan/actions';
 
-import { Container } from './styles';
+import {
+  Container,
+  Content,
+  Nav,
+  Box,
+  InputsBelow,
+} from './styles';
 
 const schema = Yup.object().shape({
   title: Yup.string(),
@@ -29,9 +34,9 @@ export default function Edit({ match }) {
 
   const plan = useSelector(state => {
     return state.plan.allPlans.find(item => {
-      return Number(item.id) === id;
+      return item.id.toString() === id;
     });
-  }) || { title: 'Digite um plano', duration: 1, price: 0 };
+  }) || { title: 'Digite um plano', duration: 0, price: 0 };
 
   const priceCurrency = useMemo(() => `R$ ${total.toFixed(2)}`, [total]);
 
@@ -49,44 +54,58 @@ export default function Edit({ match }) {
 
   return (
     <Container>
-      <header>
-        <h1>Edição de Plano</h1>
-
-        <div>
-          <ButtonBack type="button" />
-          <ButtonSave type="submit" form="plan-form" />
-        </div>
-      </header>
-
-      <Form schema={schema} onSubmit={handleEdit} id="plan-form">
-        <span>TÍTULO DO PLANO</span>
-        <Input name="title" type="text" />
-        <div>
-          <div>
-            <span>DURAÇÃO (em meses)</span>
-            <Input
-              name="duration"
-              type="number"
-              min="1"
-              step="1"
-              onChange={e => setPlanDuration(e.target.value)}
-            />
-          </div>
-          <div>
-            <span>PREÇO MENSAL</span>
-            <Input
-              name="price"
-              type="number"
-              placeholder="R$ 0.00"
-              onChange={e => setPlanPrice(e.target.value)}
-            />
-          </div>
-          <div>
-            <span>PREÇO TOTAL</span>
-            <Input name="totalPrice" value={priceCurrency} disabled />
-          </div>
-        </div>
-      </Form>
+      <Content>
+        <Form initialData={plan} schema={schema} onSubmit={handleEdit}>
+          <Nav>
+            <strong>Edição de Plano</strong>
+            <div>
+              <Link to="/plans/">
+                <MdChevronLeft size={24} color="#fff" />
+                Voltar
+              </Link>
+              <button type="submit">
+                <MdCheck size={24} color="#fff" />
+                Salvar
+              </button>
+            </div>
+          </Nav>
+          <Box>
+            <p>Título do Plano</p>
+            <Input name="title" />
+            <InputsBelow>
+              <div>
+                <p>Duração</p>
+                <Input
+                  checked={planDuration}
+                  onChange={e => setPlanDuration(e.target.value)}
+                  name="duration"
+                  type="number"
+                  min="1"
+                  step="1"
+                  autoComplete="off"
+                />
+              </div>
+              <div>
+                <p>Preço Mensal</p>
+                <Input
+                  checked={planPrice}
+                  onChange={e => setPlanPrice(e.target.value)}
+                  name="price"
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  placeholder="R$ 0.00"
+                  autoComplete="off"
+                />
+              </div>
+              <div>
+                <p>Preço Total</p>
+                <input name="total" value={priceCurrency} disabled />
+              </div>
+            </InputsBelow>
+          </Box>
+        </Form>
+      </Content>
     </Container>
   );
 }

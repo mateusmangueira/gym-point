@@ -58,7 +58,7 @@ export default function Register() {
           id="plan-form"
         >
           <span>TÍTULO DO PLANO</span>
-          <Input name="title" type="text" />
+          <Input name="title" type="text" placeholder="Título do plano"/>
           <div>
             <div>
               <span>DURAÇÃO (em meses)</span>
@@ -66,6 +66,7 @@ export default function Register() {
                 name="duration"
                 type="text"
                 onChange={e => setDurationForm(e.target.value)}
+                placeholder="Duração do plano"
               />
             </div>
             <div>
@@ -74,6 +75,7 @@ export default function Register() {
                 name="price"
                 type="price"
                 onChange={e => setPriceForm(e.target.value)}
+                placeholder="Preço do plano"
               />
             </div>
             <div>

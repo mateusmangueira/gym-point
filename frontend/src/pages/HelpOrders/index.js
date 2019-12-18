@@ -5,7 +5,7 @@ import { Input, Form } from '@rocketseat/unform';
 import { Container, Content, Items, Nav } from './styles';
 import { Modal } from '~/components/Modal';
 
-import api from '../../services/api';
+import api from '~/services/api';
 
 import {
   answerHelpOrderRequest,
@@ -39,7 +39,7 @@ export default function HelpOrders() {
     if (aHelp) {
       setQuestion(aHelp.question);
     } else {
-      toast.warn('Os pedidos estão sendo carregados');
+      toast.success('O auxílio foi carregado');
     }
   }
 

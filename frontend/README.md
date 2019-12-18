@@ -1,6 +1,6 @@
 ## Como executar a interface web
 
-Com o servidor já rodando no localhost(caso de dúvidas siga as instruções da pasta [backend](https://github.com/mateusmangueira/gym-point/tree/master/backend)
+Com o servidor já rodando no localhost siga os passos a seguir, em caso de dúvidas siga as instruções da pasta [backend](https://github.com/mateusmangueira/gym-point/tree/master/backend)
 
 Em um outro terminal, instale as depedências do projeto:
 

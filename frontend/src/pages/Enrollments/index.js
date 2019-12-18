@@ -16,7 +16,7 @@ import ButtonRegister from '~/components/ButtonRegister';
 import {
   loadAllEnrollmentsRequest,
   deleteEnrollmentRequest,
-} from '../../store/modules/enrollment/actions';
+} from '~/store/modules/enrollment/actions';
 
 export default function Enrollments() {
   const dispatch = useDispatch();
